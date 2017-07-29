@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
     paddingTop: 8,
     paddingBottom: 8,
-    paddingRight: 30,
+    paddingRight: 10,
     borderStyle: 'solid',
     borderWidth: 0.1,
     borderColor: 'black',
@@ -50,6 +50,6 @@ const styles = StyleSheet.create({
     color: 'black'
   },
   lineGap: {
-    marginTop: 10,
+    marginTop: 5,
   }
 });

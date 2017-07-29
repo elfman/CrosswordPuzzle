@@ -5,6 +5,7 @@ import {
   Dimensions,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import Sound from 'react-native-sound';
 
 import Grid from './Grid';
 import Note from './Note';
@@ -25,13 +26,25 @@ export default class Board extends Component {
 
     this.state = {
       selectState: null,
-      selectedGrid: null,
+      backgroundMusic: null,
+      board: null,
+      loadingMusic: false,
     };
-    this.initBoard();
 
     this.onGridPress = this.onGridPress.bind(this);
     this.handleInput = this.handleInput.bind(this);
     this.onHintClick = this.onHintClick.bind(this);
+  }
+
+  componentDidMount() {
+    this.playBackgroundMusic();
+    this.initBoard();
+  }
+
+  componentWillUnmount() {
+    const { backgroundMusic } = this.state;
+    backgroundMusic.stop();
+    backgroundMusic.release();
   }
 
   onGridPress(x, y) {
@@ -142,10 +155,37 @@ export default class Board extends Component {
     this.forceUpdate();
   }
 
+  playBackgroundMusic() {
+    const { backgroundMusic, loadingMusic} = this.state;
+    if (!backgroundMusic && !loadingMusic) {
+      this.setState({loadingMusic: true});
+      const music = new Sound('background.mp3', Sound.MAIN_BUNDLE, (error) => {
+        if (error) {
+          console.log('failed to load the sound', error);
+          this.setState({loadingMusic: false});
+          return;
+        }
+        music.setVolume(0.8);
+
+        music.setNumberOfLoops(-1);
+
+        music.play((success) => {
+          if (success) {
+            console.log('successfully finished playing');
+          } else {
+            console.log('playback failed due to audio decoding errors.' + success);
+          }
+        });
+
+        this.setState({ backgroundMusic: music, loadingMusic: false });
+      });
+    }
+  }
+
   initBoard() {
     // TODO data from other
     const data = BoardInfo;
-    this.state.board = parseBoardData(data);
+    this.setState({board: parseBoardData(data)});
   }
 
   render() {
@@ -153,13 +193,13 @@ export default class Board extends Component {
     const selectedGrid = selectState && board[selectState.y][selectState.x];
     const grids = [];
 
-    board.map((line, y) => {
+    board && board.map((line, y) => {
       line.map((grid, x) => {
         if (grid.text) {
           grids.push(
             <Grid
               key={`${x}-${y}`}
-              location={{x: x, y: y}}
+              location={{ x: x, y: y }}
               status={{
                 active: !!grid.active,
                 selected: !!grid.selected,
@@ -174,17 +214,17 @@ export default class Board extends Component {
     });
     return (
       <LinearGradient colors={['#006e7c', '#57c7d1', '#8fd9d2', '#eebfa1']} style={styles.container}>
-        <View style={[styles.note]}>
-        {
-          selectedGrid && <Note
-            horizontalNote={selectedGrid.horizontalNote}
-            verticalNote={selectedGrid.verticalNote}
-            horizonActive={selectState.horizontal}
-          />
-        }
-        </View>
-        <View style={[styles.board, {left: (Dimensions.get('window').width - 35*10)/2}]}>
+        <View style={[styles.board, { left: (Dimensions.get('window').width - 35 * 10) / 2 }]}>
           { grids }
+        </View>
+        <View style={[styles.note]}>
+          {
+            selectedGrid && <Note
+              horizontalNote={selectedGrid.horizontalNote}
+              verticalNote={selectedGrid.verticalNote}
+              horizonActive={selectState.horizontal}
+            />
+          }
         </View>
         <BottomLayout
           style={styles.bottomLayout}
