@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-const gridWidth = 32;
-const gridHeight = 32;
+const gridWidth = 35;
+const gridHeight = 35;
 
 export default class Grid extends Component {
   render() {
@@ -39,16 +39,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 4,
-    borderColor: 'black',
-    borderWidth: 1,
+    borderColor: '#939393',
+    borderWidth: 0.2,
     borderStyle: 'solid',
     backgroundColor: 'white',
   },
   active: {
-    backgroundColor: 'green'
+    backgroundColor: '#00ff00'
   },
   selected: {
-    backgroundColor: 'yellow'
+    backgroundColor: '#ffff00'
   },
   wrong: {
     color: 'red',

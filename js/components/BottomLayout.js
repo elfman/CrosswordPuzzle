@@ -11,6 +11,9 @@ export default class BottomLayout extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      text: null
+    };
     this.onInputDone = this.onInputDone.bind(this);
   }
   onInputDone() {

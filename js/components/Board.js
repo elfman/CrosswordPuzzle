@@ -2,7 +2,10 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
+  Dimensions,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+
 import Grid from './Grid';
 import Note from './Note';
 import BottomLayout from './BottomLayout';
@@ -106,7 +109,7 @@ export default class Board extends Component {
 
   handleInput(input) {
     const { selectState, board } = this.state;
-    if (!selectState) {
+    if (!selectState || !input) {
       return;
     }
     const selectedGrid = board[selectState.y][selectState.x];
@@ -170,16 +173,17 @@ export default class Board extends Component {
       })
     });
     return (
-      <View style={styles.container}>
+      <LinearGradient colors={['#006e7c', '#57c7d1', '#8fd9d2', '#eebfa1']} style={styles.container}>
+        <View style={[styles.note]}>
         {
           selectedGrid && <Note
-            style={styles.note}
             horizontalNote={selectedGrid.horizontalNote}
             verticalNote={selectedGrid.verticalNote}
             horizonActive={selectState.horizontal}
           />
         }
-        <View style={styles.board}>
+        </View>
+        <View style={[styles.board, {left: (Dimensions.get('window').width - 35*10)/2}]}>
           { grids }
         </View>
         <BottomLayout
@@ -187,34 +191,32 @@ export default class Board extends Component {
           handleInput={this.handleInput}
           onHintClick={this.onHintClick}
         />
-      </View>
+      </LinearGradient>
     )
   }
 }
 
+const { width } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#e66157',
+    flex: 1,
+    width: width,
     position: 'relative',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
   },
   board: {
+    position: 'absolute',
     height: 320,
-    marginTop: 60,
-    marginBottom: 30,
-    marginLeft: 10,
-    marginRight: 10,
-    position: 'relative',
+    bottom: 120,
+    left: 15,
   },
   note: {
     position: 'absolute',
-    marginTop: 10,
-    marginLeft: 8,
-    marginRight: 8,
-    top: 4,
-    left: 4,
+    top: 20,
   },
   bottomLayout: {
-    position: 'absolute',
-    bottom: 0,
+    width: width,
   }
 });
