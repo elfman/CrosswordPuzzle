@@ -3,6 +3,7 @@ import {
   StyleSheet,
   View,
   Dimensions,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Sound from 'react-native-sound';
@@ -34,6 +35,7 @@ export default class Board extends Component {
     this.onGridPress = this.onGridPress.bind(this);
     this.handleInput = this.handleInput.bind(this);
     this.onHintClick = this.onHintClick.bind(this);
+    this.onBlankAreaClick = this.onBlankAreaClick.bind(this);
   }
 
   componentDidMount() {
@@ -47,68 +49,25 @@ export default class Board extends Component {
     backgroundMusic.release();
   }
 
+  onBlankAreaClick() {
+    this.setState({selectState: null});
+  }
+
   onGridPress(x, y) {
-    const old = this.state.selectState;
-    const board = this.state.board;
-    let oldGrid;
+    const { selectState, board } = this.state;
 
-    if (old) {
-      oldGrid = board[old.y][old.x];
-    }
-    this.state.selectState = {
-      x: x,
-      y: y
-    };
-    const selectedGrid = board[y][x];
-    const activeHorizontal = () => {
-      for (let i = 0; i < selectedGrid.horizontalWord.length; i++) {
-        board[y][selectedGrid.horizontalStart + i].active = true;
-      }
-      this.state.selectState.horizontal = true;
-    };
-    const activeVertical = () => {
-      for (let i = 0; i < selectedGrid.verticalWord.length; i++) {
-        board[selectedGrid.verticalStart + i][x].active = true;
-      }
-      this.state.selectState.horizontal = false;
-    };
-
-    if (oldGrid) {
-      // clear old state
-      oldGrid.selected = false;
-      if (old.horizontal) {
-        for (let i = 0; i < oldGrid.horizontalWord.length; i++) {
-          board[old.y][oldGrid.horizontalStart + i].active = false;
-        }
-      } else {
-        for (let i = 0; i < oldGrid.verticalWord.length; i++) {
-          board[oldGrid.verticalStart + i][old.x].active = false;
-        }
-      }
-    }
-    if (old && old.x === x && old.y === y) {
-      if (old.horizontal) {
-        if (oldGrid.verticalWord) {
-          activeVertical();
-        } else {
-          activeHorizontal();
-        }
-      } else {
-        if (oldGrid.horizontalWord) {
-          activeHorizontal();
-        } else {
-          activeVertical();
-        }
-      }
+    let newState;
+    if (selectState && selectState.x === x && selectState.y === y) {
+      newState = Object.assign(selectState, {horizontal: !selectState.horizontal});
     } else {
-      if (selectedGrid.horizontalWord) {
-        activeHorizontal();
-      } else {
-        activeVertical();
+      newState = {
+        x: x,
+        y: y,
+        horizontal: !!(board[y][x].horizontalWord),
       }
     }
-    selectedGrid.selected = true;
-    this.forceUpdate();
+
+    this.setState({selectState: newState});
   }
 
   onHintClick() {
@@ -195,14 +154,22 @@ export default class Board extends Component {
 
     board && board.map((line, y) => {
       line.map((grid, x) => {
+        let active = false;
+        if (selectState) {
+          if (selectState.horizontal) {
+            active = (y === selectState.y && x >= selectedGrid.horizontalStart && x < selectedGrid.horizontalStart + selectedGrid.horizontalWord.length)
+          } else {
+            active = (x === selectState.x && y >= selectedGrid.verticalStart && y < selectedGrid.verticalStart + selectedGrid.verticalWord.length)
+          }
+        }
         if (grid.text) {
           grids.push(
             <Grid
               key={`${x}-${y}`}
               location={{ x: x, y: y }}
               status={{
-                active: !!grid.active,
-                selected: !!grid.selected,
+                active: active,
+                selected: selectState && x === selectState.x && y === selectState.y,
                 wrong: !!grid.userInput && grid.userInput !== grid.text
               }}
               text={grid.userInput}
@@ -213,25 +180,27 @@ export default class Board extends Component {
       })
     });
     return (
-      <LinearGradient colors={['#006e7c', '#57c7d1', '#8fd9d2', '#eebfa1']} style={styles.container}>
-        <View style={[styles.board, { left: (Dimensions.get('window').width - 35 * 10) / 2 }]}>
-          { grids }
-        </View>
-        <View style={[styles.note]}>
-          {
-            selectedGrid && <Note
-              horizontalNote={selectedGrid.horizontalNote}
-              verticalNote={selectedGrid.verticalNote}
-              horizonActive={selectState.horizontal}
-            />
-          }
-        </View>
-        <BottomLayout
-          style={styles.bottomLayout}
-          handleInput={this.handleInput}
-          onHintClick={this.onHintClick}
-        />
-      </LinearGradient>
+      <TouchableWithoutFeedback onPress={this.onBlankAreaClick}>
+        <LinearGradient colors={['#006e7c', '#57c7d1', '#8fd9d2', '#eebfa1']} style={styles.container}>
+          <View style={[styles.board, { left: (Dimensions.get('window').width - 35 * 10) / 2 }]}>
+            { grids }
+          </View>
+          <View style={[styles.note]}>
+            {
+              selectedGrid && <Note
+                horizontalNote={selectedGrid.horizontalNote}
+                verticalNote={selectedGrid.verticalNote}
+                horizonActive={selectState.horizontal}
+              />
+            }
+          </View>
+          <BottomLayout
+            style={styles.bottomLayout}
+            handleInput={this.handleInput}
+            onHintClick={this.onHintClick}
+          />
+        </LinearGradient>
+      </TouchableWithoutFeedback>
     )
   }
 }

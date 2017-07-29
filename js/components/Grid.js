@@ -12,6 +12,7 @@ const gridHeight = 35;
 export default class Grid extends Component {
   render() {
     const handlePress = () => {
+      console.log('grid click');
       this.props.handlePress(this.props.location.x, this.props.location.y);
     };
     return (

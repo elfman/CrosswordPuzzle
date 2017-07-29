@@ -4,6 +4,7 @@ export function parseBoardData(data) {
     board[i] = new Array(10);
     for (let j = 0; j < 10; j++) {
       board[i][j] = {
+        position: {x: j, y: i},
         text: null,
         userInput: null,
         horizontalNote: null,
