@@ -25,7 +25,7 @@ export default class Grid extends Component {
           ]}
           onPress={handlePress}
         >
-          <Text style={this.props.status.wrong && styles.wrong} >{this.props.text}</Text>
+          <Text style={[styles.text, this.props.status.wrong && styles.wrong]} >{this.props.text}</Text>
         </TouchableOpacity>
     )
   }
@@ -49,6 +49,9 @@ const styles = StyleSheet.create({
   },
   selected: {
     backgroundColor: '#ffff00'
+  },
+  text: {
+    fontSize: 20,
   },
   wrong: {
     color: 'red',
