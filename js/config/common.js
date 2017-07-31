@@ -5,6 +5,8 @@
 export default {
   activeColor: '#00ff00',
   selectedColor: '#ffff00',
+  gridBackgroundColor: '#ffffff',
+  borderColor: '#939393',
   gridWidth: 35,
   gridFontSize: 20,
   backgroundMusic: 'background.mp3',

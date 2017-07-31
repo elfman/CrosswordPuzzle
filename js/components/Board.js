@@ -36,10 +36,10 @@ export default class Board extends Component {
       appState: AppState.currentState,
     };
 
-    this.onGridPress = this.onGridPress.bind(this);
-    this.handleInput = this.handleInput.bind(this);
-    this.onHintClick = this.onHintClick.bind(this);
-    this.onBlankAreaClick = this.onBlankAreaClick.bind(this);
+    this._onGridPress = this._onGridPress.bind(this);
+    this._handleInput = this._handleInput.bind(this);
+    this._onHintClick = this._onHintClick.bind(this);
+    this._onBlankAreaClick = this._onBlankAreaClick.bind(this);
     this._handleAppStateChange = this._handleAppStateChange.bind(this);
   }
 
@@ -65,6 +65,8 @@ export default class Board extends Component {
     if (appState.match(/inactive|background/) && nextAppState === 'active') {
       if (backgroundMusic) {
         backgroundMusic.play();
+      } else {
+        this._playBackgroundMusic();
       }
     } else if (appState === 'active' && nextAppState.match(/inactive|background/)) {
       if (backgroundMusic) {
@@ -75,7 +77,7 @@ export default class Board extends Component {
   }
 
   componentWillMount() {
-    this.playBackgroundMusic();
+    this._playBackgroundMusic();
     AsyncStorage.getItem('lastPlayedSession').then(result => {
       this._loadSession(result);
     });
@@ -93,11 +95,11 @@ export default class Board extends Component {
     this._saveSession();
   }
 
-  onBlankAreaClick() {
+  _onBlankAreaClick() {
     this.setState({selectState: null});
   }
 
-  onGridPress(x, y) {
+  _onGridPress(x, y) {
     const { selectState, board } = this.state;
     const selectedGrid = board[y][x];
 
@@ -121,7 +123,7 @@ export default class Board extends Component {
     this.setState({selectState: newState});
   }
 
-  onHintClick() {
+  _onHintClick() {
     const { selectState, board } = this.state;
     if (!selectState) {
       return;
@@ -130,7 +132,7 @@ export default class Board extends Component {
     this.forceUpdate();
   }
 
-  handleInput(input) {
+  _handleInput(input) {
     const { selectState, board } = this.state;
     if (!selectState || !input) {
       return;
@@ -166,30 +168,34 @@ export default class Board extends Component {
     this.forceUpdate();
   }
 
-  playBackgroundMusic() {
+  _playBackgroundMusic() {
     const { backgroundMusic, loadingMusic} = this.state;
-    if (!backgroundMusic && !loadingMusic) {
-      this.setState({loadingMusic: true});
-      const music = new Sound('background.mp3', Sound.MAIN_BUNDLE, (error) => {
-        if (error) {
-          console.log('failed to load the sound', error);
-          this.setState({loadingMusic: false});
-          return;
-        }
-        music.setVolume(0.8);
-
-        music.setNumberOfLoops(-1);
-
-        music.play((success) => {
-          if (success) {
-            console.log('successfully finished playing');
-          } else {
-            console.log('playback failed due to audio decoding errors.' + success);
+    if (!loadingMusic) {
+      if (!backgroundMusic) {
+        this.setState({ loadingMusic: true });
+        const music = new Sound('background.mp3', Sound.MAIN_BUNDLE, (error) => {
+          if (error) {
+            console.log('failed to load the sound', error);
+            this.setState({ loadingMusic: false });
+            return;
           }
-        });
+          music.setVolume(0.8);
 
-        this.setState({ backgroundMusic: music, loadingMusic: false });
-      });
+          music.setNumberOfLoops(-1);
+
+          music.play((success) => {
+            if (success) {
+              console.log('successfully finished playing');
+            } else {
+              console.log('playback failed due to audio decoding errors.' + success);
+            }
+          });
+
+          this.setState({ backgroundMusic: music, loadingMusic: false });
+        });
+      } else {
+        backgroundMusic.play();
+      }
     }
   }
 
@@ -219,14 +225,14 @@ export default class Board extends Component {
                 wrong: !!grid.userInput && grid.userInput !== grid.text
               }}
               text={grid.userInput}
-              handlePress={this.onGridPress}
+              handlePress={this._onGridPress}
             />
           )
         }
       })
     });
     return (
-      <TouchableWithoutFeedback onPress={this.onBlankAreaClick}>
+      <TouchableWithoutFeedback onPress={this._onBlankAreaClick}>
         <LinearGradient colors={['#006e7c', '#57c7d1', '#8fd9d2', '#eebfa1']} style={styles.container}>
           <View style={[styles.board, { left: (Dimensions.get('window').width - 35 * 10) / 2 }]}>
             { grids }
@@ -242,8 +248,8 @@ export default class Board extends Component {
           </View>
           <BottomLayout
             style={styles.bottomLayout}
-            handleInput={this.handleInput}
-            onHintClick={this.onHintClick}
+            handleInput={this._handleInput}
+            onHintClick={this._onHintClick}
           />
         </LinearGradient>
       </TouchableWithoutFeedback>

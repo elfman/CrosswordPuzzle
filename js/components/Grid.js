@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
 } from 'react-native';
+import config from '../config/config';
 
 const gridWidth = 35;
 const gridHeight = 35;
@@ -12,7 +12,6 @@ const gridHeight = 35;
 export default class Grid extends Component {
   render() {
     const handlePress = () => {
-      console.log('grid click');
       this.props.handlePress(this.props.location.x, this.props.location.y);
     };
     return (
@@ -40,16 +39,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 4,
-    borderColor: '#939393',
+    borderColor: config.borderColor,
     borderWidth: 0.2,
     borderStyle: 'solid',
-    backgroundColor: 'white',
+    backgroundColor: config.gridBackgroundColor,
   },
   active: {
-    backgroundColor: '#00ff00'
+    backgroundColor: config.activeColor
   },
   selected: {
-    backgroundColor: '#ffff00'
+    backgroundColor: config.selectedColor
   },
   text: {
     fontSize: 20,
