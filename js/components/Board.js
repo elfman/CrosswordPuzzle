@@ -5,6 +5,7 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
   AsyncStorage,
+  AppState,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Sound from 'react-native-sound';
@@ -32,15 +33,17 @@ export default class Board extends Component {
       loadingMusic: false,
       sessionName: null,
       title: null,
+      appState: AppState.currentState,
     };
 
     this.onGridPress = this.onGridPress.bind(this);
     this.handleInput = this.handleInput.bind(this);
     this.onHintClick = this.onHintClick.bind(this);
     this.onBlankAreaClick = this.onBlankAreaClick.bind(this);
+    this._handleAppStateChange = this._handleAppStateChange.bind(this);
   }
 
-  loadSession(name) {
+  _loadSession(name) {
     loadSession(name).then(res => {
       if (res) {
         this.setState({ board: res.board, sessionName: res.name, title: res.title });
@@ -51,24 +54,43 @@ export default class Board extends Component {
     });
   }
 
-  saveSession() {
+  _saveSession() {
     const { sessionName, board} = this.state;
     console.log('save');
     saveSession(sessionName, board);
   }
 
+  _handleAppStateChange(nextAppState) {
+    const { appState, backgroundMusic } = this.state;
+    if (appState.match(/inactive|background/) && nextAppState === 'active') {
+      if (backgroundMusic) {
+        backgroundMusic.play();
+      }
+    } else if (appState === 'active' && nextAppState.match(/inactive|background/)) {
+      if (backgroundMusic) {
+        backgroundMusic.pause();
+      }
+    }
+    this.setState({appState: nextAppState});
+  }
+
   componentWillMount() {
     this.playBackgroundMusic();
     AsyncStorage.getItem('lastPlayedSession').then(result => {
-      this.loadSession(result);
+      this._loadSession(result);
     });
+  }
+
+  componentDidMount() {
+    AppState.addEventListener('change', this._handleAppStateChange)
   }
 
   componentWillUnmount() {
     const { backgroundMusic } = this.state;
+    AppState.addEventListener('change', this._handleAppStateChange);
     backgroundMusic.stop();
     backgroundMusic.release();
-    this.saveSession();
+    this._saveSession();
   }
 
   onBlankAreaClick() {
@@ -140,7 +162,7 @@ export default class Board extends Component {
         }
       }
     }
-    this.saveSession();
+    this._saveSession();
     this.forceUpdate();
   }
 

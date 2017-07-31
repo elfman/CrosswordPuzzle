@@ -74,8 +74,6 @@ export function saveSession(name, board) {
     });
   });
 
-  console.log(inputState);
-
   AsyncStorage.setItem(`session-${name}`, JSON.stringify(inputState)).then((err) => {
     if (err) {
       console.log('error when save session');
@@ -99,21 +97,15 @@ export function loadSession(name) {
   } else {
     session = sessionFile.sessions[0];
   }
-  if (RNFS.MainBundlePath) {
-    console.log(RNFS.readdir(RNFS.MainBundlePath));
-  } else {
-    console.log(RNFS.readDirAssets('/sessions'))
-  }
   let file;
   if (RNFS.MainBundlePath) {
     file = RNFS.readFile(RNFS.MainBundlePath +  `/sessions/${session.file}`);
   } else {
-    file = RNFS.readFileAssets(`/sessions/${session.file}`);
+    file = RNFS.readFileAssets(`sessions/${session.file}`);
   }
 
   return file.then(sessionInfo => {
     const board = parseBoardData(JSON.parse(sessionInfo));
-    console.log(board);
     return AsyncStorage.getItem(`session-${name}`).then((result) => {
       if (result) {
         let state = JSON.parse(result);
