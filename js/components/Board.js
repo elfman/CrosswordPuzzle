@@ -4,6 +4,7 @@ import {
   View,
   Dimensions,
   TouchableWithoutFeedback,
+  AsyncStorage,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Sound from 'react-native-sound';
@@ -11,11 +12,10 @@ import Sound from 'react-native-sound';
 import Grid from './Grid';
 import Note from './Note';
 import BottomLayout from './BottomLayout';
-import { parseBoardData } from '../utils';
+import { saveSession, loadSession } from '../utils';
+import config from '../config/config';
 
-import BoardInfo from '../../data/board1.json';
-
-function setGridInputText(grid, newInput) {
+function setGridUserInput(grid, newInput) {
   if (grid.userInput !== grid.text) {
     grid.userInput = newInput;
   }
@@ -30,6 +30,8 @@ export default class Board extends Component {
       backgroundMusic: null,
       board: null,
       loadingMusic: false,
+      sessionName: null,
+      title: null,
     };
 
     this.onGridPress = this.onGridPress.bind(this);
@@ -38,15 +40,35 @@ export default class Board extends Component {
     this.onBlankAreaClick = this.onBlankAreaClick.bind(this);
   }
 
-  componentDidMount() {
+  loadSession(name) {
+    loadSession(name).then(res => {
+      if (res) {
+        this.setState({ board: res.board, sessionName: res.name, title: res.title });
+        AsyncStorage.setItem('lastPlayedSession', res.name);
+      } else {
+        console.log('error when load session');
+      }
+    });
+  }
+
+  saveSession() {
+    const { sessionName, board} = this.state;
+    console.log('save');
+    saveSession(sessionName, board);
+  }
+
+  componentWillMount() {
     this.playBackgroundMusic();
-    this.initBoard();
+    AsyncStorage.getItem('lastPlayedSession').then(result => {
+      this.loadSession(result);
+    });
   }
 
   componentWillUnmount() {
     const { backgroundMusic } = this.state;
     backgroundMusic.stop();
     backgroundMusic.release();
+    this.saveSession();
   }
 
   onBlankAreaClick() {
@@ -55,10 +77,17 @@ export default class Board extends Component {
 
   onGridPress(x, y) {
     const { selectState, board } = this.state;
+    const selectedGrid = board[y][x];
 
     let newState;
     if (selectState && selectState.x === x && selectState.y === y) {
-      newState = Object.assign(selectState, {horizontal: !selectState.horizontal});
+      if ((selectState.horizontal && selectedGrid.verticalWord) || (!selectState.horizontal && selectedGrid.horizontalWord)) {
+        newState = {
+          x: x,
+          y: y,
+          horizontal: !selectState.horizontal
+        };
+      }
     } else {
       newState = {
         x: x,
@@ -92,25 +121,26 @@ export default class Board extends Component {
       const y = selectState.y;
       if (input.length === selectedGrid.horizontalWord.length) {
         for (let i = 0; i < selectedGrid.horizontalWord.length; i++) {
-          setGridInputText(board[y][selectedGrid.horizontalStart + i], input[i]);
+          setGridUserInput(board[y][selectedGrid.horizontalStart + i], input[i]);
         }
       } else {
         for (let i = 0; i < input.length && board[y][selectState.x + i].horizontalWord; i++) {
-          setGridInputText(board[y][selectState.x + i], input[i]);
+          setGridUserInput(board[y][selectState.x + i], input[i]);
         }
       }
     } else {
       const x = selectState.x;
       if (input.length === selectedGrid.verticalWord.length) {
         for (let i = 0; i < selectedGrid.verticalWord.length; i++) {
-          setGridInputText(board[selectedGrid.verticalStart + i][x], input[i]);
+          setGridUserInput(board[selectedGrid.verticalStart + i][x], input[i]);
         }
       } else {
         for (let i = 0; i < input.length && board[selectState.y + i][x].verticalWord; i++) {
-          setGridInputText(board[selectState.y + i][x], input[i]);
+          setGridUserInput(board[selectState.y + i][x], input[i]);
         }
       }
     }
+    this.saveSession();
     this.forceUpdate();
   }
 
@@ -139,12 +169,6 @@ export default class Board extends Component {
         this.setState({ backgroundMusic: music, loadingMusic: false });
       });
     }
-  }
-
-  initBoard() {
-    // TODO data from other
-    const data = BoardInfo;
-    this.setState({board: parseBoardData(data)});
   }
 
   render() {

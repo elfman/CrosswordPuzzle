@@ -1,0 +1,15 @@
+{
+  "season": 4,
+  "sessions": [
+    {
+      "name": "session1",
+      "title": "第一关",
+      "file": "session1.json"
+    },
+    {
+      "name": "session2",
+      "title": "第二关",
+      "file": "session2.json"
+    }
+  ]
+}
