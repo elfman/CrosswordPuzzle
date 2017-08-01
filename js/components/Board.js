@@ -233,8 +233,8 @@ export default class Board extends Component {
     });
     return (
       <TouchableWithoutFeedback onPress={this._onBlankAreaClick}>
-        <LinearGradient colors={['#006e7c', '#57c7d1', '#8fd9d2', '#eebfa1']} style={styles.container}>
-          <View style={[styles.board, { left: (Dimensions.get('window').width - 35 * 10) / 2 }]}>
+        <LinearGradient style={styles.container} colors={['#006e7c', '#57c7d1', '#8fd9d2', '#eebfa1']}>
+          <View style={styles.board}>
             { grids }
           </View>
           <View style={[styles.note]}>
@@ -247,7 +247,6 @@ export default class Board extends Component {
             }
           </View>
           <BottomLayout
-            style={styles.bottomLayout}
             handleInput={this._handleInput}
             onHintClick={this._onHintClick}
           />
@@ -268,16 +267,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   board: {
-    position: 'absolute',
-    height: 320,
-    bottom: 120,
-    left: 15,
+    width: config.gridWidth * 10,
+    height: config.gridWidth * 10,
+    marginBottom: 40,
   },
   note: {
     position: 'absolute',
     top: 20,
-  },
-  bottomLayout: {
-    width: width,
   }
 });
