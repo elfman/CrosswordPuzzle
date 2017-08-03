@@ -7,14 +7,17 @@ import {
   AsyncStorage,
   AppState,
 } from 'react-native';
+import { connect } from 'react-redux';
 import LinearGradient from 'react-native-linear-gradient';
+import PT from 'prop-types';
 import Sound from 'react-native-sound';
 
 import Grid from './Grid';
 import Note from './Note';
 import BottomLayout from './BottomLayout';
-import { saveSession, loadSession } from '../utils';
+import { saveSession } from '../utils';
 import config from '../config/config';
+import actions from '../actions';
 
 function setGridUserInput(grid, newInput) {
   if (grid.userInput !== grid.text) {
@@ -22,17 +25,11 @@ function setGridUserInput(grid, newInput) {
   }
 }
 
-export default class Board extends Component {
+class Board extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      selectState: null,
-      backgroundMusic: null,
-      board: null,
-      loadingMusic: false,
-      sessionName: null,
-      title: null,
       appState: AppState.currentState,
     };
 
@@ -43,30 +40,20 @@ export default class Board extends Component {
     this._handleAppStateChange = this._handleAppStateChange.bind(this);
   }
 
-  _loadSession(name) {
-    loadSession(name).then(res => {
-      if (res) {
-        this.setState({ board: res.board, sessionName: res.name, title: res.title });
-        AsyncStorage.setItem('lastPlayedSession', res.name);
-      } else {
-        console.log('error when load session');
-      }
-    });
-  }
 
   _saveSession() {
-    const { sessionName, board} = this.state;
-    console.log('save');
+    const { sessionName, board} = this.props;
     saveSession(sessionName, board);
   }
 
   _handleAppStateChange(nextAppState) {
-    const { appState, backgroundMusic } = this.state;
+    const { appState } = this.state;
+    const { backgroundMusic, playMusic, loadingMusic } = this.props;
     if (appState.match(/inactive|background/) && nextAppState === 'active') {
       if (backgroundMusic) {
         backgroundMusic.play();
-      } else {
-        this._playBackgroundMusic();
+      } else if (!loadingMusic) {
+        playMusic(config.backgroundMusic);
       }
     } else if (appState === 'active' && nextAppState.match(/inactive|background/)) {
       if (backgroundMusic) {
@@ -77,90 +64,87 @@ export default class Board extends Component {
   }
 
   componentWillMount() {
-    this._playBackgroundMusic();
+    const { playMusic, loadingMusic, loadSession } = this.props;
+    if (!loadingMusic) {
+      playMusic(config.backgroundMusic);
+    }
     AsyncStorage.getItem('lastPlayedSession').then(result => {
-      this._loadSession(result);
+      loadSession(result);
     });
   }
 
   componentDidMount() {
-    AppState.addEventListener('change', this._handleAppStateChange)
+    AppState.addEventListener('change', this._handleAppStateChange);
   }
 
   componentWillUnmount() {
-    const { backgroundMusic } = this.state;
-    AppState.addEventListener('change', this._handleAppStateChange);
-    backgroundMusic.stop();
-    backgroundMusic.release();
+    const { backgroundMusic } = this.props;
+    if (backgroundMusic) {
+      backgroundMusic.stop();
+      backgroundMusic.release();
+    }
+    AppState.removeEventListener('change', this._handleAppStateChange);
     this._saveSession();
   }
 
   _onBlankAreaClick() {
-    this.setState({selectState: null});
+    this.props.clearSelected();
   }
 
   _onGridPress(x, y) {
-    const { selectState, board } = this.state;
+    const { selectedPos, board, activeDirection, changeActiveDirection, selectGrid } = this.props;
     const selectedGrid = board[y][x];
 
-    let newState;
-    if (selectState && selectState.x === x && selectState.y === y) {
-      if ((selectState.horizontal && selectedGrid.verticalWord) || (!selectState.horizontal && selectedGrid.horizontalWord)) {
-        newState = {
-          x: x,
-          y: y,
-          horizontal: !selectState.horizontal
-        };
+    if (selectedPos && selectedPos.x === x && selectedPos.y === y) {
+      if ((activeDirection && selectedGrid.verticalWord) || (!activeDirection && selectedGrid.horizontalWord)) {
+        changeActiveDirection(!activeDirection);
       }
     } else {
-      newState = {
-        x: x,
-        y: y,
-        horizontal: !!(board[y][x].horizontalWord),
-      }
+      changeActiveDirection(!!selectedGrid.horizontalWord);
     }
-
-    this.setState({selectState: newState});
+    selectGrid(x, y);
   }
 
   _onHintClick() {
-    const { selectState, board } = this.state;
-    if (!selectState) {
+    const { board, selectedPos } = this.props;
+    if (!selectedPos) {
       return;
     }
-    board[selectState.y][selectState.x].userInput = board[selectState.y][selectState.x].text;
+    board[selectedPos.y][selectedPos.x].userInput = board[selectedPos.y][selectedPos.x].text;
+
+    this._saveSession();
     this.forceUpdate();
   }
 
   _handleInput(input) {
-    const { selectState, board } = this.state;
-    if (!selectState || !input) {
+    const { selectedPos, board, activeDirection } = this.props;
+    if (!selectedPos || !input) {
       return;
     }
-    const selectedGrid = board[selectState.y][selectState.x];
+    const selectedGrid = board[selectedPos.y][selectedPos.x];
 
     if (input.length === 1) {
       selectedGrid.userInput = input;
-    } else if (selectState.horizontal) {
-      const y = selectState.y;
+    } else if (activeDirection) {
+      const y = selectedPos.y;
       if (input.length === selectedGrid.horizontalWord.length) {
         for (let i = 0; i < selectedGrid.horizontalWord.length; i++) {
           setGridUserInput(board[y][selectedGrid.horizontalStart + i], input[i]);
         }
       } else {
-        for (let i = 0; i < input.length && board[y][selectState.x + i].horizontalWord; i++) {
-          setGridUserInput(board[y][selectState.x + i], input[i]);
+        for (let i = 0; i < input.length && board[y][selectedPos.x + i].horizontalWord; i++) {
+          setGridUserInput(board[y][selectedPos.x + i], input[i]);
         }
       }
     } else {
-      const x = selectState.x;
+      const x = selectedPos.x;
       if (input.length === selectedGrid.verticalWord.length) {
         for (let i = 0; i < selectedGrid.verticalWord.length; i++) {
           setGridUserInput(board[selectedGrid.verticalStart + i][x], input[i]);
         }
       } else {
-        for (let i = 0; i < input.length && board[selectState.y + i][x].verticalWord; i++) {
-          setGridUserInput(board[selectState.y + i][x], input[i]);
+        for (let i = 0; i < input.length && board[selectedPos.y + i][x].verticalWord; i++) {
+          setGridUserInput(board[selectedPos.y + i][x], input[i]);
         }
       }
     }
@@ -168,50 +152,19 @@ export default class Board extends Component {
     this.forceUpdate();
   }
 
-  _playBackgroundMusic() {
-    const { backgroundMusic, loadingMusic} = this.state;
-    if (!loadingMusic) {
-      if (!backgroundMusic) {
-        this.setState({ loadingMusic: true });
-        const music = new Sound('background.mp3', Sound.MAIN_BUNDLE, (error) => {
-          if (error) {
-            console.log('failed to load the sound', error);
-            this.setState({ loadingMusic: false });
-            return;
-          }
-          music.setVolume(0.8);
-
-          music.setNumberOfLoops(-1);
-
-          music.play((success) => {
-            if (success) {
-              console.log('successfully finished playing');
-            } else {
-              console.log('playback failed due to audio decoding errors.' + success);
-            }
-          });
-
-          this.setState({ backgroundMusic: music, loadingMusic: false });
-        });
-      } else {
-        backgroundMusic.play();
-      }
-    }
-  }
-
   render() {
-    const { board, selectState } = this.state;
-    const selectedGrid = selectState && board[selectState.y][selectState.x];
+    const { board, selectedPos, activeDirection } = this.props;
+    const selectedGrid = selectedPos && board[selectedPos.y][selectedPos.x];
     const grids = [];
 
     board && board.map((line, y) => {
       line.map((grid, x) => {
         let active = false;
-        if (selectState) {
-          if (selectState.horizontal) {
-            active = (y === selectState.y && x >= selectedGrid.horizontalStart && x < selectedGrid.horizontalStart + selectedGrid.horizontalWord.length)
+        if (selectedPos) {
+          if (activeDirection) {
+            active = (y === selectedPos.y && x >= selectedGrid.horizontalStart && x < selectedGrid.horizontalStart + selectedGrid.horizontalWord.length)
           } else {
-            active = (x === selectState.x && y >= selectedGrid.verticalStart && y < selectedGrid.verticalStart + selectedGrid.verticalWord.length)
+            active = (x === selectedPos.x && y >= selectedGrid.verticalStart && y < selectedGrid.verticalStart + selectedGrid.verticalWord.length)
           }
         }
         if (grid.text) {
@@ -221,7 +174,7 @@ export default class Board extends Component {
               location={{ x: x, y: y }}
               status={{
                 active: active,
-                selected: selectState && x === selectState.x && y === selectState.y,
+                selected: selectedPos && x === selectedPos.x && y === selectedPos.y,
                 wrong: !!grid.userInput && grid.userInput !== grid.text
               }}
               text={grid.userInput}
@@ -242,7 +195,7 @@ export default class Board extends Component {
               selectedGrid && <Note
                 horizontalNote={selectedGrid.horizontalNote}
                 verticalNote={selectedGrid.verticalNote}
-                horizonActive={selectState.horizontal}
+                horizonActive={activeDirection}
               />
             }
           </View>
@@ -276,3 +229,61 @@ const styles = StyleSheet.create({
     top: 20,
   }
 });
+
+Board.propTypes = {
+  selectGrid: PT.func.isRequired,
+  loadSession: PT.func.isRequired,
+  changeActiveDirection: PT.func.isRequired,
+  clearSelected: PT.func.isRequired,
+  playMusic: PT.func.isRequired,
+  board: PT.array,
+  selectedPos: PT.shape(),
+  activeDirection: PT.bool.isRequired,
+  backgroundMusic: PT.instanceOf(Sound),
+  loadingMusic: PT.bool.isRequired,
+  sessionName: PT.string,
+  title: PT.string,
+};
+
+Board.defaultProps = {
+  board: null,
+  selectedPos: null,
+  backgroundMusic: null,
+  sessionName: null,
+  title: null,
+};
+
+const mapDispatchToProps = (dispatch) => ({
+  selectGrid: (x, y) => {
+    dispatch(actions.game.selectGrid(x, y));
+  },
+  loadSession: (name) => {
+    dispatch(actions.game.loadSession(name));
+  },
+  changeActiveDirection: (direction) => {
+    dispatch(actions.game.changeActiveDirection(direction));
+  },
+  clearSelected: () => {
+    dispatch(actions.game.clearSelected());
+  },
+  playMusic: (name) => {
+    if (!name) name = config.backgroundMusic;
+    dispatch(actions.game.playMusicInit());
+    dispatch(actions.game.playMusicDone(name));
+  },
+});
+
+const mapStateToProps = state => ({
+  board: state.board,
+  selectedPos: state.selectedPos,
+  activeDirection: state.activeDirection,
+  backgroundMusic: state.backgroundMusic,
+  loadingMusic: state.loadingMusic,
+  sessionName: state.sessionName,
+  title: state.title,
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Board);

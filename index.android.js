@@ -8,13 +8,17 @@ import React, { Component } from 'react';
 import {
   AppRegistry,
 } from 'react-native';
+import { Provider } from 'react-redux';
 
 import App from './js/components/Board';
+import factory from './js/store-factory';
 
 export default class CrosswordPuzzle extends Component {
   render() {
     return (
-      <App/>
+      <Provider store={factory()}>
+        <App />
+      </Provider>
     );
   }
 }

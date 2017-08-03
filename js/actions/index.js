@@ -1,11 +1,60 @@
 import { createActions } from 'redux-actions';
+import { AsyncStorage } from 'react-native';
+import { loadSession } from '../utils';
+import Sound from 'react-native-sound';
+import config from '../config/config'
+import _ from 'lodash';
 
-function selectGrid(x, y) {
-  
+let loadingMusic = false;
+
+function playMusicDone(name) {
+  if (!name) {
+    name = config.backgroundMusic;
+  }
+  return new Promise((fullfilled, reject) => {
+    const music = new Sound(name, Sound.MAIN_BUNDLE, (error) => {
+      loadingMusic = false;
+      if (error) {
+        console.log('failed to load the sound', error);
+        reject('failed to load the sound');
+        return;
+      }
+      music.setVolume(0.8);
+
+      music.setNumberOfLoops(-1);
+
+      music.play((success) => {
+        if (success) {
+          console.log('successfully finished playing');
+        } else {
+          console.log('playback failed due to audio decoding errors.' + success);
+        }
+      });
+
+      fullfilled({ name: name, music: music });
+    });
+  });
 }
 
-export default createActions({
-  SELECT_GRID: undefined,
-  INPUT_WORD: undefined,
+function _loadSession(sessionName) {
+  return loadSession(sessionName).then((session) => {
+    AsyncStorage.setItem('lastPlayedSession', session.name);
+    return ({
+      name: session.name,
+      title: session.title,
+      board: session.board
+    })
+  });
+}
 
+
+export default createActions({
+  GAME: {
+    LOAD_SESSION: _loadSession,
+    SELECT_GRID: (x, y) => ({ x: x, y: y }),
+    CHANGE_ACTIVE_DIRECTION: direction => !!direction,
+    CLEAR_SELECTED: _.noop,
+    PLAY_MUSIC_INIT: _.noop,
+    PLAY_MUSIC_DONE: playMusicDone,
+  }
 })
