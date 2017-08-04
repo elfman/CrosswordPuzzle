@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { StackNavigator } from 'react-navigation';
 
-import Main from './components/Board';
+import Game from './container/Game';
 import Profile from './container/Profile';
 import ChooseMission from './container/ChooseMission';
 
 export default StackNavigator({
   Home: {
-    screen: Main,
+    screen: Game,
     navigationOptions: ({navigation}) => ({
       // headerTitle: 'This is header title',
       header: null,

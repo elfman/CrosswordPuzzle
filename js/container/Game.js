@@ -12,10 +12,10 @@ import LinearGradient from 'react-native-linear-gradient';
 import PT from 'prop-types';
 import Sound from 'react-native-sound';
 
-import Grid from './Grid';
-import Note from './Note';
-import BottomLayout from './BottomLayout';
-import TopLayout from './TopLayout';
+import Grid from '../components/Grid';
+import Note from '../components/Note';
+import BottomLayout from '../components/BottomLayout';
+import TopLayout from '../components/TopLayout';
 import { saveMission } from '../utils';
 import config from '../config/config';
 import actions from '../actions';
