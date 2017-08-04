@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {
   AsyncStorage
 } from 'react-native';
@@ -76,12 +76,16 @@ export function saveMission(name, board) {
 
   AsyncStorage.setItem(`mission-${name}`, JSON.stringify(inputState)).then((err) => {
     if (err) {
-      console.log('error when save mission');
-    } else {
-      console.log('save success');
+      console.log('error when save mission', err);
     }
     return err;
   });
+}
+
+export function resetMission(name) {
+  if (name) {
+    AsyncStorage.removeItem(`mission-${name}`);
+  }
 }
 
 export function loadMission(name) {

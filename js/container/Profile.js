@@ -7,9 +7,13 @@ import {
   FlatList,
   Image
 } from 'react-native';
+import { connect } from 'react-redux';
 import _ from 'lodash';
+import PT from 'prop-types';
 
+import { resetMission } from '../utils';
 import arrow from '../../resources/images/arrow.png';
+import actions from '../actions';
 
 const listItems = [
   {
@@ -24,11 +28,29 @@ const listItems = [
 ];
 
 class Profile extends Component {
+  profileItems = [
+    {
+      title: '选择关卡',
+      path: 'ChooseMission',
+    },
+    {
+      title: '重置本关',
+      rightText: this.props.missionName,
+      onPress: () => {
+        const { missionName, loadMission, navigation } = this.props;
+        resetMission(missionName);
+        loadMission(missionName);
+        navigation.goBack();
+      },
+    }
+  ];
+
+
   render() {
     const {navigation} = this.props;
     return (
       <FlatList
-        data={listItems}
+        data={this.profileItems}
         keyExtractor={item => item.title}
         renderItem={({item, index}) => {
           const { onPress, rightText, title, path } = item;
@@ -90,5 +112,24 @@ const itemStyles = StyleSheet.create({
   }
 });
 
-export default Profile;
+Profile.propTypes = {
+  missionName: PT.string.isRequired,
+  loadMission: PT.func.isRequired,
+  navigation: PT.object.isRequired,
+};
+
+const mapStateToProps = state => ({
+  missionName: state.missionName,
+});
+
+const mapDispatchToProps = dispatch => ({
+  loadMission: (name) => {
+    dispatch(actions.game.loadMission(name));
+  }
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Profile);
 
