@@ -22,7 +22,7 @@ export function parseBoardData(data) {
     }
   }
 
-  data.board.map(word => {
+  data.map(word => {
     let x = word.x;
     let y = word.y;
     for (let i = 0; i < word.text.length; i++) {
@@ -101,25 +101,17 @@ export function loadMission(name) {
   } else {
     mission = missionFile.missions[0];
   }
-  let file;
-  if (RNFS.MainBundlePath) {
-    file = RNFS.readFile(RNFS.MainBundlePath +  `/sessions/${mission.file}`);
-  } else {
-    file = RNFS.readFileAssets(`sessions/${mission.file}`);
-  }
 
-  return file.then(missionInfo => {
-    const board = parseBoardData(JSON.parse(missionInfo));
-    return AsyncStorage.getItem(`mission-${name}`).then((result) => {
-      if (result) {
-        let state = JSON.parse(result);
-        state.map(obj => {
-          board[obj.y][obj.x].userInput = obj.input;
-        });
-      }
-      mission.board = board;
-      return mission;
-    });
-  }).catch(error => console.log('error when reading mission board'));
+  const board = parseBoardData(mission.boardSource);
+  return AsyncStorage.getItem(`mission-${name}`).then((result) => {
+    if (result) {
+      let state = JSON.parse(result);
+      state.map(obj => {
+        board[obj.y][obj.x].userInput = obj.input;
+      });
+    }
+    mission.board = board;
+    return mission;
+  });
 
 }

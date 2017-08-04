@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
   },
   note: {
     position: 'absolute',
-    top: 20,
+    top: 50,
   },
   topLayout: {
     paddingTop: 20,
