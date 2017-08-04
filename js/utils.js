@@ -3,7 +3,7 @@ import {
   AsyncStorage
 } from 'react-native';
 import RNFS from 'react-native-fs';
-import sessionFile from './sessions.json';
+import missionFile from './missions.json';
 
 export function parseBoardData(data) {
   const board = new Array(10);
@@ -60,7 +60,7 @@ export function parseBoardData(data) {
   return board;
 }
 
-export function saveSession(name, board) {
+export function saveMission(name, board) {
   let inputState = [];
   board.map((line, y) => {
     line.map((grid, x) => {
@@ -74,9 +74,9 @@ export function saveSession(name, board) {
     });
   });
 
-  AsyncStorage.setItem(`session-${name}`, JSON.stringify(inputState)).then((err) => {
+  AsyncStorage.setItem(`mission-${name}`, JSON.stringify(inputState)).then((err) => {
     if (err) {
-      console.log('error when save session');
+      console.log('error when save mission');
     } else {
       console.log('save success');
     }
@@ -84,38 +84,38 @@ export function saveSession(name, board) {
   });
 }
 
-export function loadSession(name) {
-  let session;
+export function loadMission(name) {
+  let mission;
   if (name) {
-    const tmp = sessionFile.sessions.filter(session => session.name === name);
+    const tmp = missionFile.missions.filter(mission => mission.name === name);
     if (tmp.length === 0) {
-      console.log(`can not find session ${name}`);
+      console.log(`can not find mission ${name}`);
       return Promise.resolve(null);
     } else {
-      session = tmp[0];
+      mission = tmp[0];
     }
   } else {
-    session = sessionFile.sessions[0];
+    mission = missionFile.missions[0];
   }
   let file;
   if (RNFS.MainBundlePath) {
-    file = RNFS.readFile(RNFS.MainBundlePath +  `/sessions/${session.file}`);
+    file = RNFS.readFile(RNFS.MainBundlePath +  `/sessions/${mission.file}`);
   } else {
-    file = RNFS.readFileAssets(`sessions/${session.file}`);
+    file = RNFS.readFileAssets(`sessions/${mission.file}`);
   }
 
-  return file.then(sessionInfo => {
-    const board = parseBoardData(JSON.parse(sessionInfo));
-    return AsyncStorage.getItem(`session-${name}`).then((result) => {
+  return file.then(missionInfo => {
+    const board = parseBoardData(JSON.parse(missionInfo));
+    return AsyncStorage.getItem(`mission-${name}`).then((result) => {
       if (result) {
         let state = JSON.parse(result);
         state.map(obj => {
           board[obj.y][obj.x].userInput = obj.input;
         });
       }
-      session.board = board;
-      return session;
+      mission.board = board;
+      return mission;
     });
-  }).catch(error => console.log('error when reading session board'));
+  }).catch(error => console.log('error when reading mission board'));
 
 }

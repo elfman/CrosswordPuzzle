@@ -1,6 +1,6 @@
 import { createActions } from 'redux-actions';
 import { AsyncStorage } from 'react-native';
-import { loadSession } from '../utils';
+import { loadMission } from '../utils';
 import Sound from 'react-native-sound';
 import config from '../config/config'
 import _ from 'lodash';
@@ -11,7 +11,7 @@ function playMusicDone(name) {
   if (!name) {
     name = config.backgroundMusic;
   }
-  return new Promise((fullfilled, reject) => {
+  return new Promise((resolve, reject) => {
     const music = new Sound(name, Sound.MAIN_BUNDLE, (error) => {
       loadingMusic = false;
       if (error) {
@@ -31,13 +31,13 @@ function playMusicDone(name) {
         }
       });
 
-      fullfilled({ name: name, music: music });
+      resolve({ name: name, music: music });
     });
   });
 }
 
-function _loadSession(sessionName) {
-  return loadSession(sessionName).then((session) => {
+function _loadMission(missionName) {
+  return loadMission(missionName).then((session) => {
     AsyncStorage.setItem('lastPlayedSession', session.name);
     return ({
       name: session.name,
@@ -50,7 +50,7 @@ function _loadSession(sessionName) {
 
 export default createActions({
   GAME: {
-    LOAD_SESSION: _loadSession,
+    LOAD_MISSION: _loadMission,
     SELECT_GRID: (x, y) => ({ x: x, y: y }),
     CHANGE_ACTIVE_DIRECTION: direction => !!direction,
     CLEAR_SELECTED: _.noop,

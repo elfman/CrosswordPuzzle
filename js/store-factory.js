@@ -14,7 +14,7 @@ export default function factory() {
     selectedPos: null,
     board: null,
     title: null,
-    session: null,
+    missionName: null,
   }, enhancer);
 
   return store;

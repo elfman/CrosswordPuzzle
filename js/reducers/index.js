@@ -14,9 +14,10 @@ function create() {
       ...state,
       activeDirection: actions.payload,
     }),
-    [a.loadSession]: (state, actions) => ({
+    [a.loadMission]: (state, actions) => ({
         ...state,
-        sessionName: actions.payload.name,
+        selectedPos: null,
+        missionName: actions.payload.name,
         title: actions.payload.title,
         board: actions.payload.board,
     }),
@@ -28,12 +29,18 @@ function create() {
       ...state,
       loadingMusic: true,
     }),
-    [a.playMusicDone]: (state, actions) => ({
-      ...state,
-      loadingMusic: false,
-      backgroundMusicName: actions.payload.name,
-      backgroundMusic: actions.payload.music,
-    }),
+    [a.playMusicDone]: (state, actions) => {
+      if (state.backgroundMusic) {
+        state.backgroundMusic.stop();
+        state.backgroundMusic.release();
+      }
+      return {
+        ...state,
+        loadingMusic: false,
+        backgroundMusicName: actions.payload.name,
+        backgroundMusic: actions.payload.music,
+      };
+    },
   }, {
     activeDirection: true,
     loadingMusic: false,
@@ -42,7 +49,7 @@ function create() {
     selectedPos: null,
     board: null,
     title: null,
-    session: null,
+    missionName: null,
   })
 }
 

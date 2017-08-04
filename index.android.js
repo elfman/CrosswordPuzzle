@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Provider } from 'react-redux';
 
-import App from './js/components/Board';
+import App from './js/app';
 import factory from './js/store-factory';
 
 export default class CrosswordPuzzle extends Component {

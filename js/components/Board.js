@@ -15,7 +15,8 @@ import Sound from 'react-native-sound';
 import Grid from './Grid';
 import Note from './Note';
 import BottomLayout from './BottomLayout';
-import { saveSession } from '../utils';
+import TopLayout from './TopLayout';
+import { saveMission } from '../utils';
 import config from '../config/config';
 import actions from '../actions';
 
@@ -38,12 +39,13 @@ class Board extends Component {
     this._onHintClick = this._onHintClick.bind(this);
     this._onBlankAreaClick = this._onBlankAreaClick.bind(this);
     this._handleAppStateChange = this._handleAppStateChange.bind(this);
+    this._openProfile = this._openProfile.bind(this);
   }
 
 
-  _saveSession() {
-    const { sessionName, board} = this.props;
-    saveSession(sessionName, board);
+  _saveMission() {
+    const { missionName, board} = this.props;
+    saveMission(missionName, board);
   }
 
   _handleAppStateChange(nextAppState) {
@@ -64,12 +66,12 @@ class Board extends Component {
   }
 
   componentWillMount() {
-    const { playMusic, loadingMusic, loadSession } = this.props;
-    if (!loadingMusic) {
+    const { playMusic, loadingMusic, loadMission, backgroundMusic } = this.props;
+    if (!loadingMusic && !backgroundMusic) {
       playMusic(config.backgroundMusic);
     }
-    AsyncStorage.getItem('lastPlayedSession').then(result => {
-      loadSession(result);
+    AsyncStorage.getItem('lastPlayedMission').then(result => {
+      loadMission(result);
     });
   }
 
@@ -84,7 +86,7 @@ class Board extends Component {
       backgroundMusic.release();
     }
     AppState.removeEventListener('change', this._handleAppStateChange);
-    this._saveSession();
+    this._saveMission();
   }
 
   _onBlankAreaClick() {
@@ -112,7 +114,7 @@ class Board extends Component {
     }
     board[selectedPos.y][selectedPos.x].userInput = board[selectedPos.y][selectedPos.x].text;
 
-    this._saveSession();
+    this._saveMission();
     this.forceUpdate();
   }
 
@@ -148,8 +150,13 @@ class Board extends Component {
         }
       }
     }
-    this._saveSession();
+    this._saveMission();
     this.forceUpdate();
+  }
+
+  _openProfile() {
+    const { navigate } = this.props.navigation;
+    navigate('Profile');
   }
 
   render() {
@@ -187,6 +194,11 @@ class Board extends Component {
     return (
       <TouchableWithoutFeedback onPress={this._onBlankAreaClick}>
         <LinearGradient style={styles.container} colors={['#006e7c', '#57c7d1', '#8fd9d2', '#eebfa1']}>
+          <TopLayout
+            style={styles.topLayout}
+            openProfile={this._openProfile}
+            score="10%"
+            title="title"/>
           <View style={styles.board}>
             { grids }
           </View>
@@ -216,23 +228,25 @@ const styles = StyleSheet.create({
     flex: 1,
     width: width,
     position: 'relative',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
   board: {
     width: config.gridWidth * 10,
     height: config.gridWidth * 10,
-    marginBottom: 40,
   },
   note: {
     position: 'absolute',
     top: 20,
+  },
+  topLayout: {
+    paddingTop: 20,
   }
 });
 
 Board.propTypes = {
   selectGrid: PT.func.isRequired,
-  loadSession: PT.func.isRequired,
+  loadMission: PT.func.isRequired,
   changeActiveDirection: PT.func.isRequired,
   clearSelected: PT.func.isRequired,
   playMusic: PT.func.isRequired,
@@ -241,7 +255,8 @@ Board.propTypes = {
   activeDirection: PT.bool.isRequired,
   backgroundMusic: PT.instanceOf(Sound),
   loadingMusic: PT.bool.isRequired,
-  sessionName: PT.string,
+  navigation: PT.shape().isRequired,
+  missionName: PT.string,
   title: PT.string,
 };
 
@@ -249,7 +264,7 @@ Board.defaultProps = {
   board: null,
   selectedPos: null,
   backgroundMusic: null,
-  sessionName: null,
+  missionName: null,
   title: null,
 };
 
@@ -257,8 +272,8 @@ const mapDispatchToProps = (dispatch) => ({
   selectGrid: (x, y) => {
     dispatch(actions.game.selectGrid(x, y));
   },
-  loadSession: (name) => {
-    dispatch(actions.game.loadSession(name));
+  loadMission: (name) => {
+    dispatch(actions.game.loadMission(name));
   },
   changeActiveDirection: (direction) => {
     dispatch(actions.game.changeActiveDirection(direction));
@@ -279,7 +294,7 @@ const mapStateToProps = state => ({
   activeDirection: state.activeDirection,
   backgroundMusic: state.backgroundMusic,
   loadingMusic: state.loadingMusic,
-  sessionName: state.sessionName,
+  missionName: state.missionName,
   title: state.title,
 });
 
