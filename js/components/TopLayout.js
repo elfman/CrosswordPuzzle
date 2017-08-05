@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import PT from 'prop-types';
 
+import menuIcon from '../../resources/images/menu.png';
+
 class TopLayout extends Component {
   render() {
     const { score, title, openProfile } = this.props;
@@ -20,9 +22,11 @@ class TopLayout extends Component {
         <Text style={styles.title}>
           {title}
         </Text>
-        <TouchableOpacity style={styles.button} onPress={openProfile}>
-          <Text>Profile</Text>
-        </TouchableOpacity>
+        <View style={styles.button}>
+          <TouchableOpacity onPress={openProfile}>
+            <Image style={{width: 20, height: 20}} source={menuIcon}/>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -50,15 +54,21 @@ const styles = StyleSheet.create({
   },
   score: {
     width: 60,
+    marginLeft: 30,
+    fontSize: 17,
   },
   title: {
     flex: 1,
+    fontSize: 16,
     justifyContent: 'center',
     alignItems: 'center',
     textAlign: 'center',
   },
   button: {
-    width: 80,
+    width: 60,
+    marginRight: 30,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   }
 });
 

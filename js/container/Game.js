@@ -40,6 +40,7 @@ class Board extends Component {
     this._onBlankAreaClick = this._onBlankAreaClick.bind(this);
     this._handleAppStateChange = this._handleAppStateChange.bind(this);
     this._openProfile = this._openProfile.bind(this);
+    this._computeGameProgress = this._computeGameProgress.bind(this);
   }
 
 
@@ -177,8 +178,22 @@ class Board extends Component {
     navigate('Profile');
   }
 
+  _computeGameProgress() {
+    const { board } = this.props;
+
+    let total = 0;
+    let correct = 0;
+    board && board.map(line => {
+      line.map(grid => {
+        total++;
+        if (grid.userInput === grid.text) correct++;
+      })
+    });
+    return (total === 0 && '0%') || (correct / total * 100).toFixed(0) + '%';
+  }
+
   render() {
-    const { board, selectedPos, activeDirection } = this.props;
+    const { board, selectedPos, activeDirection, title } = this.props;
     const selectedGrid = selectedPos && board[selectedPos.y][selectedPos.x];
     const grids = [];
 
@@ -215,8 +230,8 @@ class Board extends Component {
           <TopLayout
             style={styles.topLayout}
             openProfile={this._openProfile}
-            score="10%"
-            title="title"/>
+            score={this._computeGameProgress()}
+            title={title}/>
           <View style={styles.board}>
             { grids }
           </View>

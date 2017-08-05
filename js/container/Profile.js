@@ -50,6 +50,7 @@ class Profile extends Component {
     const {navigation} = this.props;
     return (
       <FlatList
+        style={styles.list}
         data={this.profileItems}
         keyExtractor={item => item.title}
         renderItem={({item, index}) => {
@@ -74,16 +75,23 @@ class Profile extends Component {
   }
 }
 
+const styles = StyleSheet.create({
+  list: {
+    marginTop: 30,
+  }
+});
+
 const itemStyles = StyleSheet.create({
   container: {
-    backgroundColor: '#ccc',
-    height: 60,
+    backgroundColor: 'white',
+    height: 40,
     flexDirection: 'row',
     flexWrap: 'nowrap',
     alignItems: 'center',
     paddingLeft: 20,
     paddingRight: 20,
     justifyContent: 'space-between',
+    borderColor: '#777',
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   title: {
@@ -99,7 +107,7 @@ const itemStyles = StyleSheet.create({
   },
   rightText: {
     fontSize: 18,
-    color: '#555',
+    color: '#888',
   },
   arrow: {
     marginLeft: 6,

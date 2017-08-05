@@ -9,17 +9,6 @@ export function parseBoardData(data) {
   const board = new Array(10);
   for (let i = 0; i < 10; i++) {
     board[i] = new Array(10);
-    for (let j = 0; j < 10; j++) {
-      board[i][j] = {
-        position: {x: j, y: i},
-        text: null,
-        userInput: null,
-        horizontalNote: null,
-        verticalNote: null,
-        selected: false,
-        active: false
-      }
-    }
   }
 
   data.map(word => {
@@ -30,8 +19,8 @@ export function parseBoardData(data) {
         console.error(`error in board json file， x:${x},y:${y}, word:${word.text}, i:${i}`);
         return;
       }
-      const grid = board[y][x];
-      if (grid.text !== null && grid.text !== word.text[i]) {
+      const grid = board[y][x] = {};
+      if (grid.text && grid.text !== word.text[i]) {
         console.error(`error in board json file， x:${x},y:${y}, word:${word.text}, i:${i}`);
         return;
       } else {

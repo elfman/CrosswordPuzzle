@@ -21,6 +21,7 @@ class ChooseMission extends Component {
   render() {
     return (
       <FlatList
+        style={styles.list}
         data={missionFile.missions}
         keyExtractor={item => item.name}
         renderItem={({item, index}) => {
@@ -38,11 +39,17 @@ class ChooseMission extends Component {
   }
 }
 
+const styles = StyleSheet.create({
+  list: {
+    marginTop: 30,
+  }
+});
+
 const itemStyles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#ccc',
-    height: 60,
+    backgroundColor: 'white',
+    height: 40,
     paddingLeft: 20,
     paddingRight: 20,
     alignItems: 'center',
