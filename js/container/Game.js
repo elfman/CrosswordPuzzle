@@ -108,50 +108,68 @@ class Board extends Component {
   }
 
   _onHintClick() {
-    const { board, selectedPos } = this.props;
+    const { board, selectedPos, requestHint } = this.props;
     if (!selectedPos) {
       return;
     }
-    board[selectedPos.y][selectedPos.x].userInput = board[selectedPos.y][selectedPos.x].text;
 
-    this._saveMission();
-    this.forceUpdate();
+    if (board[selectedPos.y][selectedPos.x].userInput !== board[selectedPos.y][selectedPos.x].text) {
+      requestHint(selectedPos.x, selectedPos.y);
+    }
   }
 
   _handleInput(input) {
-    const { selectedPos, board, activeDirection } = this.props;
+    const { selectedPos, board, activeDirection, inputWord } = this.props;
     if (!selectedPos || !input) {
       return;
     }
     const selectedGrid = board[selectedPos.y][selectedPos.x];
 
+    const positions = [];
     if (input.length === 1) {
-      selectedGrid.userInput = input;
+      positions.push({ x: selectedPos.x, y: selectedPos.y, input: input });
     } else if (activeDirection) {
       const y = selectedPos.y;
       if (input.length === selectedGrid.horizontalWord.length) {
         for (let i = 0; i < selectedGrid.horizontalWord.length; i++) {
-          setGridUserInput(board[y][selectedGrid.horizontalStart + i], input[i]);
+          positions.push({
+            x: selectedGrid.horizontalStart + i,
+            y: y,
+            input: input[i]
+          });
         }
       } else {
         for (let i = 0; i < input.length && board[y][selectedPos.x + i].horizontalWord; i++) {
-          setGridUserInput(board[y][selectedPos.x + i], input[i]);
+          positions.push({
+            x: selectedPos.x + i,
+            y: y,
+            input: input[i],
+          });
         }
       }
     } else {
       const x = selectedPos.x;
       if (input.length === selectedGrid.verticalWord.length) {
         for (let i = 0; i < selectedGrid.verticalWord.length; i++) {
-          setGridUserInput(board[selectedGrid.verticalStart + i][x], input[i]);
+          positions.push({
+            x: x,
+            y: selectedGrid.verticalStart + i,
+            input: input[i],
+          });
         }
       } else {
         for (let i = 0; i < input.length && board[selectedPos.y + i][x].verticalWord; i++) {
-          setGridUserInput(board[selectedPos.y + i][x], input[i]);
+          positions.push({
+            x: x,
+            y: selectedPos.y + i,
+            input: input[i],
+          });
         }
       }
     }
-    this._saveMission();
-    this.forceUpdate();
+    if (positions.length > 0) {
+      inputWord(positions);
+    }
   }
 
   _openProfile() {
@@ -250,6 +268,8 @@ Board.propTypes = {
   changeActiveDirection: PT.func.isRequired,
   clearSelected: PT.func.isRequired,
   playMusic: PT.func.isRequired,
+  requestHint: PT.func.isRequired,
+  inputWord: PT.func.isRequired,
   board: PT.array,
   selectedPos: PT.shape(),
   activeDirection: PT.bool.isRequired,
@@ -286,6 +306,12 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(actions.game.playMusicInit());
     dispatch(actions.game.playMusicDone(name));
   },
+  requestHint: (x, y) => {
+    dispatch(actions.game.requestHint(x, y));
+  },
+  inputWord: (positions) => {
+    dispatch(actions.game.inputWord(positions));
+  }
 });
 
 const mapStateToProps = state => ({

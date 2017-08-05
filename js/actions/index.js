@@ -53,6 +53,8 @@ export default createActions({
     LOAD_MISSION: _loadMission,
     SELECT_GRID: (x, y) => ({ x: x, y: y }),
     CHANGE_ACTIVE_DIRECTION: direction => !!direction,
+    REQUEST_HINT: (x, y) => ({ x: x, y: y}),
+    INPUT_WORD: (grids) => (grids),
     CLEAR_SELECTED: _.noop,
     PLAY_MUSIC_INIT: _.noop,
     PLAY_MUSIC_DONE: playMusicDone,

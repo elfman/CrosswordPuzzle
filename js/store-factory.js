@@ -3,10 +3,11 @@ import { createStore, applyMiddleware } from 'redux';
 import promiseMiddleware from 'redux-promise';
 
 import reducer from './reducers';
+import {saveMission} from './utils';
 
 export default function factory() {
   const enhancer = applyMiddleware(promiseMiddleware);
-  const store = createStore(reducer, {
+  const initState = {
     activeDirection: true,
     loadingMusic: false,
     backgroundMusicName: null,
@@ -15,7 +16,17 @@ export default function factory() {
     board: null,
     title: null,
     missionName: null,
-  }, enhancer);
+  };
+  const store = createStore(reducer, initState, enhancer);
+
+  let currentBoard = initState.board;
+  store.subscribe(() => {
+    let prevBoard = currentBoard;
+    currentBoard = store.getState().board;
+    if (currentBoard !== prevBoard) {
+      saveMission(store.getState().missionName, currentBoard);
+    }
+  });
 
   return store;
 }
