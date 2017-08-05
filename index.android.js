@@ -15,9 +15,6 @@ import factory from './js/store-factory';
 
 export default class CrosswordPuzzle extends Component {
   render() {
-    const store = factory();
-    store.subscribe()
-
     return (
       <Provider store={factory()}>
         <App />
