@@ -5,7 +5,8 @@ import {
   View,
   StyleSheet,
   FlatList,
-  Image
+  Image,
+  Alert,
 } from 'react-native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
@@ -38,9 +39,14 @@ class Profile extends Component {
       rightText: this.props.missionName,
       onPress: () => {
         const { missionName, loadMission, navigation } = this.props;
-        resetMission(missionName);
-        loadMission(missionName);
-        navigation.goBack();
+        Alert.alert(missionName, '确定要重置本关卡？', [
+          {text: '取消', onPress: _.noop},
+          {text: '确定', onPress: () => {
+            resetMission(missionName);
+            loadMission(missionName);
+            navigation.goBack();
+          }}
+        ]);
       },
     }
   ];
