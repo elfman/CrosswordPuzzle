@@ -140,7 +140,7 @@ class Board extends Component {
           });
         }
       } else {
-        for (let i = 0; i < input.length && board[y][selectedPos.x + i].horizontalWord; i++) {
+        for (let i = 0; i < input.length && board[y][selectedPos.x + i]; i++) {
           positions.push({
             x: selectedPos.x + i,
             y: y,
@@ -159,7 +159,7 @@ class Board extends Component {
           });
         }
       } else {
-        for (let i = 0; i < input.length && board[selectedPos.y + i][x].verticalWord; i++) {
+        for (let i = 0; i < input.length && board[selectedPos.y + i][x]; i++) {
           positions.push({
             x: x,
             y: selectedPos.y + i,

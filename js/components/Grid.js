@@ -5,31 +5,50 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import config from '../config/config';
+import PT from 'prop-types';
 
 const gridWidth = 35;
 const gridHeight = 35;
 
 export default class Grid extends Component {
+  constructor(props) {
+    super(props);
+
+    this._handlePress = this._handlePress.bind(this);
+  }
+  _handlePress() {
+    const {handlePress, location: {x, y}} = this.props;
+    handlePress(x, y);
+  }
   render() {
-    const handlePress = () => {
-      this.props.handlePress(this.props.location.x, this.props.location.y);
-    };
+    const { location, status, text} = this.props;
     return (
         <TouchableOpacity
           style={[styles.grid,
-            this.props.status.active && styles.active,
-            this.props.status.selected && styles.selected, {
-              top: this.props.location.y * gridHeight,
-              left: this.props.location.x * gridWidth,
+            status.active && styles.active,
+            status.selected && styles.selected, {
+              top: location.y * gridHeight,
+              left: location.x * gridWidth,
             }
           ]}
-          onPress={handlePress}
+          onPress={this._handlePress}
         >
-          <Text style={[styles.text, this.props.status.wrong && styles.wrong]} >{this.props.text}</Text>
+          <Text style={[styles.text, status.wrong && styles.wrong]} >{text}</Text>
         </TouchableOpacity>
     )
   }
 }
+
+Grid.propTypes = {
+  status: PT.shape().isRequired,
+  location: PT.shape().isRequired,
+  handlePress: PT.func.isRequired,
+  text: PT.string,
+};
+
+Grid.defaultProps = {
+  text: null,
+};
 
 const styles = StyleSheet.create({
   grid: {
