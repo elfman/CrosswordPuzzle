@@ -4,6 +4,7 @@ import {
   Text,
   View
 } from 'react-native';
+import PT from 'prop-types';
 
 export default class Note extends Component {
   render() {
@@ -21,13 +22,24 @@ export default class Note extends Component {
           verticalNote && <Text
             style={[styles.text, !horizonActive && styles.active, horizontalNote && styles.lineGap]}
           >
-            纵：{this.props.verticalNote}
+            纵：{verticalNote}
           </Text>
         }
       </View>
     )
   }
 }
+
+Note.PropTypes = {
+  horizontalNote: PT.string,
+  verticalNote: PT.string,
+  horizonActive: PT.bool,
+};
+Note.defaultProps = {
+  horizontalNote: null,
+  verticalNote: null,
+  horizonActive: false,
+};
 
 const styles = StyleSheet.create({
   container: {

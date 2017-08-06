@@ -19,7 +19,10 @@ export function parseBoardData(data) {
         console.error(`error in board json file， x:${x},y:${y}, word:${word.text}, i:${i}`);
         return;
       }
-      const grid = board[y][x] = {};
+      if (!board[y][x]) {
+        board[y][x] = {};
+      }
+      const grid = board[y][x];
       if (grid.text && grid.text !== word.text[i]) {
         console.error(`error in board json file， x:${x},y:${y}, word:${word.text}, i:${i}`);
         return;

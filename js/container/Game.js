@@ -189,7 +189,7 @@ class Board extends Component {
         if (grid.userInput === grid.text) correct++;
       })
     });
-    return (total === 0 && '0%') || (correct / total * 100).toFixed(0) + '%';
+    return (total === 0 && ' ') || `${correct}/${total}`;
   }
 
   render() {
