@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import {
-  StyleSheet,
   View,
-  Dimensions,
   TouchableWithoutFeedback,
   AsyncStorage,
   AppState,
@@ -20,11 +18,9 @@ import { saveMission } from '../utils';
 import config from '../config/config';
 import actions from '../actions';
 
-function setGridUserInput(grid, newInput) {
-  if (grid.userInput !== grid.text) {
-    grid.userInput = newInput;
-  }
-}
+import styleSet from '../styles/styles';
+
+const styles = styleSet.gameStyles;
 
 class Board extends Component {
   constructor(props) {
@@ -227,15 +223,16 @@ class Board extends Component {
     return (
       <TouchableWithoutFeedback onPress={this._onBlankAreaClick}>
         <LinearGradient style={styles.container} colors={['#006e7c', '#57c7d1', '#8fd9d2', '#eebfa1']}>
-          <TopLayout
-            style={styles.topLayout}
-            openProfile={this._openProfile}
-            score={this._computeGameProgress()}
-            title={title}/>
+          <View style={styles.topLayout}>
+            <TopLayout
+              openProfile={this._openProfile}
+              score={this._computeGameProgress()}
+              title={title}/>
+          </View>
           <View style={styles.board}>
             { grids }
           </View>
-          <View style={[styles.note]}>
+          <View style={styles.note}>
             {
               selectedGrid && <Note
                 horizontalNote={selectedGrid.horizontalNote}
@@ -254,28 +251,6 @@ class Board extends Component {
   }
 }
 
-const { width } = Dimensions.get('window');
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: width,
-    position: 'relative',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  board: {
-    width: config.gridWidth * 10,
-    height: config.gridWidth * 10,
-  },
-  note: {
-    position: 'absolute',
-    top: 50,
-  },
-  topLayout: {
-    paddingTop: 20,
-  }
-});
 
 Board.propTypes = {
   selectGrid: PT.func.isRequired,

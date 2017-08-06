@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
 const itemStyles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
-    height: 40,
+    height: 48,
     flexDirection: 'row',
     flexWrap: 'nowrap',
     alignItems: 'center',
@@ -103,7 +103,7 @@ const itemStyles = StyleSheet.create({
   title: {
     flex: 1,
     fontSize: 18,
-    fontWeight: 'bold',
+    color: 'black',
   },
   right: {
     justifyContent: 'flex-end',

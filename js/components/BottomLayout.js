@@ -33,9 +33,10 @@ export default class BottomLayout extends Component {
           onSubmitEditing={this.onInputDone}
           autoCorrect={false}
           underlineColorAndroid="transparent"
+          placeholder={'输入答案后提交'}
         />
         <TouchableOpacity style={styles.done} onPress={this.onInputDone}>
-          <Text>Done</Text>
+          <Text>提交</Text>
         </TouchableOpacity>
       </View>
     )

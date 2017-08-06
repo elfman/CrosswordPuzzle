@@ -24,7 +24,7 @@ class TopLayout extends Component {
         </Text>
         <View style={styles.button}>
           <TouchableOpacity onPress={openProfile}>
-            <Image style={{width: 20, height: 20}} source={menuIcon}/>
+            <Image style={{width: 25, height: 25}} source={menuIcon}/>
           </TouchableOpacity>
         </View>
       </View>
@@ -45,27 +45,28 @@ TopLayout.defaultProps = {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     flexDirection: 'row',
     flexWrap: 'nowrap',
-    height: 50,
-    paddingTop: 20,
+    height: 30,
     justifyContent: 'space-between',
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
+    alignItems: 'center',
   },
   score: {
-    width: 60,
+    flex: 0.2,
     marginLeft: 30,
-    fontSize: 17,
+    fontSize: 19,
   },
   title: {
-    flex: 1,
-    fontSize: 16,
+    flex: 0.6,
+    fontSize: 18,
     justifyContent: 'center',
     alignItems: 'center',
     textAlign: 'center',
   },
   button: {
-    width: 60,
+    flex: 0.2,
     marginRight: 30,
     flexDirection: 'row',
     justifyContent: 'flex-end',
