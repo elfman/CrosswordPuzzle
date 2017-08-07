@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
 const itemStyles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
-    height: 48,
+    height: 50,
     flexDirection: 'row',
     flexWrap: 'nowrap',
     alignItems: 'center',

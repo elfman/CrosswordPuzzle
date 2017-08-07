@@ -4,6 +4,8 @@ import {
   TouchableWithoutFeedback,
   AsyncStorage,
   AppState,
+  Platform,
+  Dimensions,
 } from 'react-native';
 import { connect } from 'react-redux';
 import LinearGradient from 'react-native-linear-gradient';
@@ -17,10 +19,6 @@ import TopLayout from '../components/TopLayout';
 import { saveMission } from '../utils';
 import config from '../config/config';
 import actions from '../actions';
-
-import styleSet from '../styles/styles';
-
-const styles = styleSet.gameStyles;
 
 class Board extends Component {
   constructor(props) {
@@ -250,6 +248,34 @@ class Board extends Component {
     )
   }
 }
+
+const { width } = Dimensions.get('window');
+
+const styles = {
+  container: {
+    flex: 1,
+    width: width,
+    position: 'relative',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  board: {
+    marginBottom: 20,
+    width: config.gridWidth * 10,
+    height: config.gridWidth * 10,
+  },
+  note: {
+    position: 'absolute',
+    top: 55,
+  },
+  topLayout: {
+    width: width,
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 20 : 0,
+    zIndex: 3,
+  }
+};
+
 
 
 Board.propTypes = {
