@@ -4,7 +4,9 @@ import {
   View,
   Text,
   TouchableOpacity,
-  TextInput
+  TextInput,
+  KeyboardAvoidingView,
+  Dimensions
 } from 'react-native';
 
 export default class BottomLayout extends Component {
@@ -16,29 +18,31 @@ export default class BottomLayout extends Component {
     };
     this.onInputDone = this.onInputDone.bind(this);
   }
+
   onInputDone() {
     this.props.handleInput(this.state.text);
     this.refs.input.clear();
   }
+
   render() {
     return (
-      <View style={styles.container}>
-        <TouchableOpacity style={styles.hint} onPress={this.props.onHintClick}>
-          <Text>提示</Text>
-        </TouchableOpacity>
-        <TextInput
-          ref="input"
-          style={styles.input}
-          onChangeText={text => this.setState({text})}
-          onSubmitEditing={this.onInputDone}
-          autoCorrect={false}
-          underlineColorAndroid="transparent"
-          placeholder={'输入答案后提交'}
-        />
-        <TouchableOpacity style={styles.done} onPress={this.onInputDone}>
-          <Text>提交</Text>
-        </TouchableOpacity>
-      </View>
+        <KeyboardAvoidingView style={{width: Dimensions.get('window').width}} contentContainerStyle={styles.container} behavior="position" keyboardVerticalOffset={0}>
+          <TouchableOpacity style={styles.hint} onPress={this.props.onHintClick}>
+            <Text>提示</Text>
+          </TouchableOpacity>
+          <TextInput
+            ref="input"
+            style={styles.input}
+            onChangeText={text => this.setState({ text })}
+            onSubmitEditing={this.onInputDone}
+            autoCorrect={false}
+            underlineColorAndroid="transparent"
+            placeholder={'输入答案后提交'}
+          />
+          <TouchableOpacity style={styles.done} onPress={this.onInputDone}>
+            <Text>提交</Text>
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
     )
   }
 }
@@ -52,6 +56,7 @@ const styles = StyleSheet.create({
   },
   hint: {
     width: 50,
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -68,6 +73,7 @@ const styles = StyleSheet.create({
   },
   done: {
     width: 50,
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   }
