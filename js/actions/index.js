@@ -38,7 +38,7 @@ function playMusicDone(name) {
 
 function _loadMission(missionName) {
   return loadMission(missionName).then((session) => {
-    AsyncStorage.setItem('lastPlayedSession', session.name);
+    AsyncStorage.setItem('lastPlayedMission', session.name);
     return ({
       name: session.name,
       title: session.title,

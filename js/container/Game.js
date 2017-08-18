@@ -6,6 +6,7 @@ import {
   AppState,
   Platform,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { connect } from 'react-redux';
 import LinearGradient from 'react-native-linear-gradient';
@@ -16,7 +17,7 @@ import Grid from '../components/Grid';
 import Note from '../components/Note';
 import BottomLayout from '../components/BottomLayout';
 import TopLayout from '../components/TopLayout';
-import { saveMission } from '../utils';
+import { saveMission, getMissionsData } from '../utils';
 import config from '../config/config';
 import actions from '../actions';
 
@@ -26,6 +27,8 @@ class Board extends Component {
 
     this.state = {
       appState: AppState.currentState,
+      gameProgress: '',
+      alertNext: true,
     };
 
     this._onGridPress = this._onGridPress.bind(this);
@@ -82,6 +85,63 @@ class Board extends Component {
     }
     AppState.removeEventListener('change', this._handleAppStateChange);
     this._saveMission();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { board, missionName } = this.props;
+
+    let {correct, total} = this._computeGameProgress(nextProps.board);
+    this.setState({
+      gameProgress: (total === 0 && ' ') || `${correct}/${total}`,
+    });
+
+    if (nextProps.missionName !== missionName) {
+      this.setState({
+        alertNext: true,
+      });
+    } else if (nextProps.board !== board) {
+      if (total > 0 && correct === total && this.state.alertNext) {
+        Alert.alert('提示', '你已完成这一关卡，是否前往下一关卡？', [
+          {text: '否', style: 'cancel', onPress: () => {
+            this.setState({
+              alertNext: false,
+            });
+          }},
+          {text: '是', onPress: () => {
+            this._loadNextMission().done();
+          }}
+        ])
+      }
+    }
+  }
+
+  async _loadNextMission() {
+    const { loadMission } = this.props;
+    AsyncStorage.getItem('lastPlayedMission').then(async (name) => {
+      const missionsList = getMissionsData().missions;
+      if (!name) {
+        loadMission(missionsList[0].name);
+        return;
+      }
+      let i;
+      for (i = 0; i < missionsList.length; i++) {
+        if (missionsList[i].name === name) {
+          break;
+        }
+      }
+      for (i = ((i+1) % missionsList.length); missionsList[i].name !== name; i = ((i+1) % missionsList.length)) {
+        try {
+          const progress = JSON.parse(await AsyncStorage.getItem(`mission-${missionsList[i].name}`));
+          if (!progress || progress.correct < progress.total) {
+            loadMission(missionsList[i].name);
+            return;
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      }
+      Alert.alert('提示', '恭喜您已完成全部关卡！');
+    });
   }
 
   _onBlankAreaClick() {
@@ -172,9 +232,7 @@ class Board extends Component {
     navigate('Profile');
   }
 
-  _computeGameProgress() {
-    const { board } = this.props;
-
+  _computeGameProgress(board) {
     let total = 0;
     let correct = 0;
     board && board.map(line => {
@@ -183,11 +241,12 @@ class Board extends Component {
         if (grid.userInput === grid.text) correct++;
       })
     });
-    return (total === 0 && ' ') || `${correct}/${total}`;
+    return {correct: correct, total: total};
   }
 
   render() {
     const { board, selectedPos, activeDirection, title } = this.props;
+    const { gameProgress } = this.state;
     const selectedGrid = selectedPos && board[selectedPos.y][selectedPos.x];
     const grids = [];
 
@@ -224,7 +283,7 @@ class Board extends Component {
           <View style={styles.topLayout}>
             <TopLayout
               openProfile={this._openProfile}
-              score={this._computeGameProgress()}
+              score={gameProgress}
               title={title}/>
           </View>
           <View style={styles.board}>

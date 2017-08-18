@@ -3,7 +3,7 @@ import {
   AsyncStorage
 } from 'react-native';
 import RNFS from 'react-native-fs';
-import missionFile from './missions.json';
+import missionsData from './missions.json';
 
 export function parseBoardData(data) {
   const board = new Array(10);
@@ -54,19 +54,28 @@ export function parseBoardData(data) {
 
 export function saveMission(name, board) {
   let inputState = [];
+  let correct = 0;
+  let total = 0;
   board.map((line, y) => {
     line.map((grid, x) => {
+      if (grid) total++;
+
       if (grid && grid.userInput) {
         inputState.push({
           x: x,
           y: y,
           input: grid.userInput
         });
+        if (grid.userInput === grid.text) correct++;
       }
     });
   });
 
-  AsyncStorage.setItem(`mission-${name}`, JSON.stringify(inputState)).then((err) => {
+  AsyncStorage.setItem(`mission-${name}`, JSON.stringify({
+    correct: correct,
+    total: total,
+    inputState: inputState
+  })).then((err) => {
     if (err) {
       console.log('error when save mission', err);
     }
@@ -82,6 +91,7 @@ export function resetMission(name) {
 
 export function loadMission(name) {
   let mission;
+  const missionFile = getMissionsData();
   if (name) {
     const tmp = missionFile.missions.filter(mission => mission.name === name);
     if (tmp.length === 0) {
@@ -95,9 +105,9 @@ export function loadMission(name) {
   }
 
   const board = parseBoardData(mission.boardSource);
-  return AsyncStorage.getItem(`mission-${name}`).then((result) => {
-    if (result) {
-      let state = JSON.parse(result);
+  return AsyncStorage.getItem(`mission-${name}`).then(res => JSON.parse(res)).then((result) => {
+    if (result && result.inputState) {
+      let state = result.inputState;
       state.map(obj => {
         board[obj.y][obj.x].userInput = obj.input;
       });
@@ -105,5 +115,8 @@ export function loadMission(name) {
     mission.board = board;
     return mission;
   });
+}
 
+export function getMissionsData() {
+  return missionsData;
 }

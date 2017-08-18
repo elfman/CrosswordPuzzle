@@ -3,13 +3,12 @@ import {
   Text,
   View,
   StyleSheet,
-  Button,
   Image,
   TouchableOpacity,
 } from 'react-native';
 import PT from 'prop-types';
 
-import menuIcon from '../../resources/images/menu.png';
+import settingsIcon from '../../resources/images/settings.png';
 
 class TopLayout extends Component {
   render() {
@@ -24,7 +23,7 @@ class TopLayout extends Component {
         </Text>
         <View style={styles.button}>
           <TouchableOpacity onPress={openProfile}>
-            <Image style={{width: 25, height: 25}} source={menuIcon}/>
+            <Image style={{width: 25, height: 25}} source={settingsIcon}/>
           </TouchableOpacity>
         </View>
       </View>

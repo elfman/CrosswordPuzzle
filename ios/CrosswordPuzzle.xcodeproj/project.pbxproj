@@ -36,7 +36,6 @@
 		2DCD954D1E0B4F2C00145EB5 /* CrosswordPuzzleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* CrosswordPuzzleTests.m */; };
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
 		773D9F641F2C70DF00AF4462 /* background.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 773D9F631F2C70DF00AF4462 /* background.mp3 */; };
-		77D193501F2EE38B00A0316F /* sessions in Resources */ = {isa = PBXBuildFile; fileRef = 77D1934F1F2EE38B00A0316F /* sessions */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		9774134B0927498695995F2A /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AA0FB6933344CCC9AB3A81D /* libRNFS.a */; };
 		AC2AA78287814D5CA97BA746 /* libBVLinearGradient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B87830415EB423388FD9912 /* libBVLinearGradient.a */; };
@@ -318,7 +317,6 @@
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
 		6F78D5ADD32D4D8F80DE5736 /* RNFS.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../node_modules/react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
 		773D9F631F2C70DF00AF4462 /* background.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = background.mp3; path = ../android/app/src/main/res/raw/background.mp3; sourceTree = "<group>"; };
-		77D1934F1F2EE38B00A0316F /* sessions */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sessions; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		89E7251D94EC429FBA304F5F /* BVLinearGradient.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = BVLinearGradient.xcodeproj; path = "../node_modules/react-native-linear-gradient/BVLinearGradient.xcodeproj"; sourceTree = "<group>"; };
@@ -567,7 +565,6 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				77D1934F1F2EE38B00A0316F /* sessions */,
 				773D9F631F2C70DF00AF4462 /* background.mp3 */,
 				13B07FAE1A68108700A75B9A /* CrosswordPuzzle */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -1019,7 +1016,6 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				773D9F641F2C70DF00AF4462 /* background.mp3 in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
-				77D193501F2EE38B00A0316F /* sessions in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1199,8 +1195,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-        ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-        ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = "";
@@ -1226,8 +1221,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-        ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-        ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				HEADER_SEARCH_PATHS = (
