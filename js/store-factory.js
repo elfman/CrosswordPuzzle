@@ -4,6 +4,8 @@ import promiseMiddleware from 'redux-promise';
 
 import reducer from './reducers';
 import {saveMission} from './utils';
+import config from './config';
+import actions from './actions';
 
 export default function factory() {
   const enhancer = applyMiddleware(promiseMiddleware);
@@ -16,6 +18,7 @@ export default function factory() {
     board: null,
     title: null,
     missionName: null,
+    config: config,
   };
   const store = createStore(reducer, initState, enhancer);
 
@@ -27,6 +30,23 @@ export default function factory() {
       saveMission(store.getState().missionName, currentBoard);
     }
   });
+
+
+  // let lastConfig = initState.config;
+  // store.subscribe(() => {
+  //   let prevConfig = lastConfig;
+  //   lastConfig = store.getState().config;
+  //   if (!prevConfig.playBackgroundMusic && lastConfig.playBackgroundMusic) {
+  //     if (store.getState().backgroundMusic) {
+  //       store.getState().backgroundMusic.play();
+  //     } else {
+  //       store.dispatch(actions.game.playMusicInit());
+  //       store.dispatch(actions.game.playMusicDone(config.backgroundMusic));
+  //     }
+  //   } else if (prevConfig.playBackgroundMusic && !lastConfig.playBackgroundMusic) {
+  //     store.getState().backgroundMusic.stop();
+  //   }
+  // });
 
   return store;
 }

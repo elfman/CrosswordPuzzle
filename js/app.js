@@ -4,6 +4,7 @@ import { StackNavigator } from 'react-navigation';
 import Game from './container/Game';
 import Profile from './container/Profile';
 import ChooseMission from './container/ChooseMission';
+import Settings from './container/Settings';
 
 export default StackNavigator({
   Home: {
@@ -16,7 +17,7 @@ export default StackNavigator({
   Profile: {
     screen: Profile,
     navigationOptions: () => ({
-      headerTitle: '游戏设置'
+      headerTitle: '选项'
     })
   },
   ChooseMission: {
@@ -25,4 +26,10 @@ export default StackNavigator({
       headerTitle: '选择关卡',
     })
   },
+  Settings: {
+    screen: Settings,
+    navigationOptions: () => ({
+      headerTitle: '设置'
+    })
+  }
 });

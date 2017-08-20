@@ -18,7 +18,6 @@ import Note from '../components/Note';
 import BottomLayout from '../components/BottomLayout';
 import TopLayout from '../components/TopLayout';
 import { saveMission, getMissionsData } from '../utils';
-import config from '../config/config';
 import actions from '../actions';
 
 class Board extends Component {
@@ -48,7 +47,7 @@ class Board extends Component {
 
   _handleAppStateChange(nextAppState) {
     const { appState } = this.state;
-    const { backgroundMusic, playMusic, loadingMusic } = this.props;
+    const { backgroundMusic, playMusic, loadingMusic, config } = this.props;
     if (appState.match(/inactive|background/) && nextAppState === 'active') {
       if (backgroundMusic) {
         backgroundMusic.play();
@@ -64,17 +63,24 @@ class Board extends Component {
   }
 
   componentWillMount() {
-    const { playMusic, loadingMusic, loadMission, backgroundMusic } = this.props;
-    if (!loadingMusic && !backgroundMusic) {
-      playMusic(config.backgroundMusic);
-    }
+    const { loadMission } = this.props;
     AsyncStorage.getItem('lastPlayedMission').then(result => {
       loadMission(result);
     });
   }
 
   componentDidMount() {
+    const { playMusic, loadingMusic, backgroundMusic, config } = this.props;
     AppState.addEventListener('change', this._handleAppStateChange);
+    AsyncStorage.getItem('playBackgroundMusic').then((value) => {
+      if (value !== 'false' && !loadingMusic) {
+        if (backgroundMusic) {
+          backgroundMusic.play();
+        } else {
+          playMusic(config.backgroundMusicName);
+        }
+      }
+    })
   }
 
   componentWillUnmount() {
@@ -245,7 +251,7 @@ class Board extends Component {
   }
 
   render() {
-    const { board, selectedPos, activeDirection, title } = this.props;
+    const { board, selectedPos, activeDirection, title, config } = this.props;
     const { gameProgress } = this.state;
     const selectedGrid = selectedPos && board[selectedPos.y][selectedPos.x];
     const grids = [];
@@ -270,6 +276,7 @@ class Board extends Component {
                 selected: selectedPos && x === selectedPos.x && y === selectedPos.y,
                 wrong: !!grid.userInput && grid.userInput !== grid.text
               }}
+              config={config}
               text={grid.userInput}
               handlePress={this._onGridPress}
             />
@@ -286,7 +293,7 @@ class Board extends Component {
               score={gameProgress}
               title={title}/>
           </View>
-          <View style={styles.board}>
+          <View style={[styles.board, {width: config.gridWidth * 10, height: config.gridWidth * 10}]}>
             { grids }
           </View>
           <View style={styles.note}>
@@ -320,8 +327,6 @@ const styles = {
   },
   board: {
     marginBottom: 20,
-    width: config.gridWidth * 10,
-    height: config.gridWidth * 10,
   },
   note: {
     position: 'absolute',
@@ -353,6 +358,7 @@ Board.propTypes = {
   navigation: PT.shape().isRequired,
   missionName: PT.string,
   title: PT.string,
+  config: PT.shape().isRequired,
 };
 
 Board.defaultProps = {
@@ -363,7 +369,7 @@ Board.defaultProps = {
   title: null,
 };
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch, ownProps) => ({
   selectGrid: (x, y) => {
     dispatch(actions.game.selectGrid(x, y));
   },
@@ -377,7 +383,6 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(actions.game.clearSelected());
   },
   playMusic: (name) => {
-    if (!name) name = config.backgroundMusic;
     dispatch(actions.game.playMusicInit());
     dispatch(actions.game.playMusicDone(name));
   },
@@ -397,6 +402,7 @@ const mapStateToProps = state => ({
   loadingMusic: state.loadingMusic,
   missionName: state.missionName,
   title: state.title,
+  config: state.config,
 });
 
 export default connect(

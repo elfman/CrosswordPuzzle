@@ -16,18 +16,6 @@ import { resetMission } from '../utils';
 import arrow from '../../resources/images/arrow.png';
 import actions from '../actions';
 
-const listItems = [
-  {
-    title: '选择关卡',
-    path: 'ChooseMission',
-  },
-  {
-    title: '重置本关',
-    rightText: '第3关',
-    onPress: _.noop,
-  }
-];
-
 class Profile extends Component {
   profileItems = [
     {
@@ -48,6 +36,10 @@ class Profile extends Component {
           }}
         ]);
       },
+    },
+    {
+      title: '游戏设置',
+      path: 'Settings',
     }
   ];
 
@@ -66,7 +58,7 @@ class Profile extends Component {
               onPress={onPress ? onPress :
                 (path && (() => navigation.navigate(path, {profileKey: navigation.state.key})))}
             >
-              <View style={[itemStyles.container, (index >= listItems.length - 1) && itemStyles.noBorder]}>
+              <View style={[itemStyles.container, (index >= this.profileItems.length - 1) && itemStyles.noBorder]}>
                 <Text style={itemStyles.title}>{title}</Text>
                 <View style={itemStyles.right}>
                   { rightText && <Text style={itemStyles.rightText}>{rightText}</Text> }

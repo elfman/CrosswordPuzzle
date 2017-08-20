@@ -2,15 +2,11 @@ import { createActions } from 'redux-actions';
 import { AsyncStorage } from 'react-native';
 import { loadMission } from '../utils';
 import Sound from 'react-native-sound';
-import config from '../config/config'
 import _ from 'lodash';
 
 let loadingMusic = false;
 
 function playMusicDone(name) {
-  if (!name) {
-    name = config.backgroundMusic;
-  }
   return new Promise((resolve, reject) => {
     const music = new Sound(name, Sound.MAIN_BUNDLE, (error) => {
       loadingMusic = false;
@@ -47,6 +43,10 @@ function _loadMission(missionName) {
   });
 }
 
+function loadConfig() {
+  AsyncStorage.getItem('gameConfig')
+    .then(res => JSON.parse(res));
+}
 
 export default createActions({
   GAME: {
@@ -58,5 +58,7 @@ export default createActions({
     CLEAR_SELECTED: _.noop,
     PLAY_MUSIC_INIT: _.noop,
     PLAY_MUSIC_DONE: playMusicDone,
+    LOAD_CONFIG: loadConfig,
+    SET_CONFIG: config => config,
   }
 })

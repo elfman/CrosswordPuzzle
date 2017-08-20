@@ -9,10 +9,9 @@ export default {
   borderColor: '#939393',
   gridWidth: 35,
   gridFontSize: 20,
-  backgroundMusic: 'background.mp3',
+  backgroundMusicName: 'background.mp3',
   backgroundMusicLoop: -1,
-  backgroundMusicAutoplay: true,
+  playBackgroundMusic: false,
   defaultSessionName: 'session2',
   noteBackgroundColor: '#aedc43',
-
-}
+};

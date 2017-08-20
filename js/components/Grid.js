@@ -4,11 +4,7 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
-import config from '../config/config';
 import PT from 'prop-types';
-
-const gridWidth = 35;
-const gridHeight = 35;
 
 export default class Grid extends Component {
   constructor(props) {
@@ -16,58 +12,42 @@ export default class Grid extends Component {
 
     this._handlePress = this._handlePress.bind(this);
   }
+
   _handlePress() {
-    const {handlePress, location: {x, y}} = this.props;
+    const { handlePress, location: { x, y } } = this.props;
     handlePress(x, y);
   }
+
   render() {
-    const { location, status, text} = this.props;
+    const { location, status, text, config } = this.props;
     return (
-        <TouchableOpacity
-          style={[styles.grid,
-            status.active && styles.active,
-            status.selected && styles.selected, {
-              top: location.y * gridHeight,
-              left: location.x * gridWidth,
-            }
-          ]}
-          onPress={this._handlePress}
-        >
-          <Text style={[styles.text, status.wrong && styles.wrong]} >{text}</Text>
-        </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.grid, {
+          width: config.gridWidth,
+          height: config.gridWidth,
+          backgroundColor: status.active ? config.activeColor
+            : (status.selected ? config.selectedColor : config.gridBackgroundColor)
+        }, {
+          top: location.y * config.gridWidth,
+          left: location.x * config.gridWidth,
+        }
+        ]}
+        onPress={this._handlePress}
+      >
+        <Text style={[styles.text, status.wrong && styles.wrong]}>{text}</Text>
+      </TouchableOpacity>
     )
   }
 }
 
-Grid.propTypes = {
-  status: PT.shape().isRequired,
-  location: PT.shape().isRequired,
-  handlePress: PT.func.isRequired,
-  text: PT.string,
-};
-
-Grid.defaultProps = {
-  text: null,
-};
-
 const styles = StyleSheet.create({
   grid: {
     position: 'absolute',
-    width: gridWidth,
-    height: gridHeight,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 4,
-    borderColor: config.borderColor,
     borderWidth: 0.2,
     borderStyle: 'solid',
-    backgroundColor: config.gridBackgroundColor,
-  },
-  active: {
-    backgroundColor: config.activeColor
-  },
-  selected: {
-    backgroundColor: config.selectedColor
   },
   text: {
     fontSize: 20,
@@ -77,3 +57,15 @@ const styles = StyleSheet.create({
     color: 'red',
   }
 });
+
+Grid.propTypes = {
+  status: PT.shape().isRequired,
+  location: PT.shape().isRequired,
+  handlePress: PT.func.isRequired,
+  text: PT.string,
+  config: PT.shape().isRequired,
+};
+
+Grid.defaultProps = {
+  text: null,
+};

@@ -71,6 +71,19 @@ function create() {
         ...state,
         board: board,
       }
+    },
+    [a.setConfig]: (state, {payload}) => {
+      return {
+        ...state,
+        config: payload,
+      }
+    },
+    [a.loadConfig]: (state, {payload}) => {
+      const config = Object.assign({}, state.gameConfig, payload);
+      return {
+        ...state,
+        config: config,
+      }
     }
   }, {
     activeDirection: true,
@@ -81,6 +94,7 @@ function create() {
     board: null,
     title: null,
     missionName: null,
+    config: null,
   })
 }
 
