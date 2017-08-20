@@ -23,13 +23,13 @@ export default class Grid extends Component {
     return (
       <TouchableOpacity
         style={[styles.grid, {
-          width: config.gridWidth,
-          height: config.gridWidth,
-          backgroundColor: status.active ? config.activeColor
-            : (status.selected ? config.selectedColor : config.gridBackgroundColor)
+          width: config.gridSize,
+          height: config.gridSize,
+          backgroundColor: status.selected ? config.selectedColor
+            : (status.active ? config.activeColor : config.gridBackgroundColor)
         }, {
-          top: location.y * config.gridWidth,
-          left: location.x * config.gridWidth,
+          top: location.y * config.gridSize,
+          left: location.x * config.gridSize,
         }
         ]}
         onPress={this._handlePress}

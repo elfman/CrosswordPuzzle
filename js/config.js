@@ -7,7 +7,7 @@ export default {
   selectedColor: '#ffff00',
   gridBackgroundColor: '#ffffff',
   borderColor: '#939393',
-  gridWidth: 35,
+  gridSize: 35,
   gridFontSize: 20,
   backgroundMusicName: 'background.mp3',
   backgroundMusicLoop: -1,

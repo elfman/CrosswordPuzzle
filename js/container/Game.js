@@ -293,7 +293,7 @@ class Board extends Component {
               score={gameProgress}
               title={title}/>
           </View>
-          <View style={[styles.board, {width: config.gridWidth * 10, height: config.gridWidth * 10}]}>
+          <View style={[styles.board, {width: config.gridSize * 10, height: config.gridSize * 10}]}>
             { grids }
           </View>
           <View style={styles.note}>
