@@ -7,11 +7,13 @@ import {
   Platform,
   Dimensions,
   Alert,
+  KeyboardAvoidingView
 } from 'react-native';
 import { connect } from 'react-redux';
 import LinearGradient from 'react-native-linear-gradient';
 import PT from 'prop-types';
 import Sound from 'react-native-sound';
+import KeepAwake from 'react-native-keep-awake';
 
 import Grid from '../components/Grid';
 import Note from '../components/Note';
@@ -287,7 +289,8 @@ class Board extends Component {
     return (
       <TouchableWithoutFeedback onPress={this._onBlankAreaClick}>
         <LinearGradient style={styles.container} colors={['#006e7c', '#57c7d1', '#8fd9d2', '#eebfa1']}>
-          <View style={styles.topLayout}>
+          <View
+            style={styles.topLayout}>
             <TopLayout
               openProfile={this._openProfile}
               score={gameProgress}
@@ -305,38 +308,52 @@ class Board extends Component {
               />
             }
           </View>
-          <BottomLayout
-            handleInput={this._handleInput}
-            onHintClick={this._onHintClick}
-          />
+          <KeyboardAvoidingView
+            style={styles.bottomLayout}
+            behavior={Platform.OS === 'ios' ? 'position' : null}
+            contentContainerStyle={styles.bottomLayout}
+            keyboardVerticalOffset={0}
+          >
+            <BottomLayout
+              handleInput={this._handleInput}
+              onHintClick={this._onHintClick}
+            />
+          </KeyboardAvoidingView>
+          <KeepAwake/>
         </LinearGradient>
       </TouchableWithoutFeedback>
     )
   }
 }
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const styles = {
   container: {
     flex: 1,
     width: width,
-    position: 'relative',
-    justifyContent: 'flex-end',
+    height: height,
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
   board: {
-    marginBottom: 20,
+    marginTop: 60,
   },
   note: {
     position: 'absolute',
     top: 55,
   },
+  bottomLayout: {
+    width: width,
+    height: 44,
+    position: 'absolute',
+    bottom: 0,
+    zIndex: 3,
+  },
   topLayout: {
     width: width,
-    position: 'absolute',
-    top: Platform.OS === 'ios' ? 20 : 0,
-    zIndex: 3,
+    height: 30,
+    marginTop: Platform.OS === 'ios' ? 20 : 0,
   }
 };
 

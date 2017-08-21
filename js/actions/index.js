@@ -15,7 +15,7 @@ function playMusicDone(name) {
         reject('failed to load the sound');
         return;
       }
-      music.setVolume(0.8);
+      music.setVolume(1);
 
       music.setNumberOfLoops(-1);
 

@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   TextInput,
   KeyboardAvoidingView,
-  Dimensions
+  Dimensions,
+  Platform,
 } from 'react-native';
 
 export default class BottomLayout extends Component {
@@ -25,8 +26,9 @@ export default class BottomLayout extends Component {
   }
 
   render() {
-    return (
-        <KeyboardAvoidingView style={{width: Dimensions.get('window').width}} contentContainerStyle={styles.container} behavior="position" keyboardVerticalOffset={0}>
+    // if (Platform.OS === 'android') {
+      return (
+        <View style={styles.container}>
           <TouchableOpacity style={styles.hint} onPress={this.props.onHintClick}>
             <Text>提示</Text>
           </TouchableOpacity>
@@ -42,8 +44,33 @@ export default class BottomLayout extends Component {
           <TouchableOpacity style={styles.done} onPress={this.onInputDone}>
             <Text>提交</Text>
           </TouchableOpacity>
-        </KeyboardAvoidingView>
-    )
+        </View>
+      )
+    // } else {
+    //   return (
+    //     <KeyboardAvoidingView
+    //       style={{ width: Dimensions.get('window').width }}
+    //       contentContainerStyle={styles.container}
+    //       behavior="padding"
+    //       keyboardVerticalOffset={0}>
+    //       <TouchableOpacity style={styles.hint} onPress={this.props.onHintClick}>
+    //         <Text>提示</Text>
+    //       </TouchableOpacity>
+    //       <TextInput
+    //         ref="input"
+    //         style={styles.input}
+    //         onChangeText={text => this.setState({ text })}
+    //         onSubmitEditing={this.onInputDone}
+    //         autoCorrect={false}
+    //         underlineColorAndroid="transparent"
+    //         placeholder={'输入答案后提交'}
+    //       />
+    //       <TouchableOpacity style={styles.done} onPress={this.onInputDone}>
+    //         <Text>提交</Text>
+    //       </TouchableOpacity>
+    //     </KeyboardAvoidingView>
+    //   )
+    // }
   }
 }
 
